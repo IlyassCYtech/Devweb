@@ -1,5 +1,6 @@
 <?php
 // Démarrer la session
+
 session_start();
 
 // Inclure la connexion à la DB
@@ -46,7 +47,7 @@ try {
         $niveau = trim($_POST['niveau']);
         $points_experience = (int)$_POST['points_experience'];
         $admin = isset($_POST['admin']) ? (int)$_POST['admin'] : 0;
-
+        $photo = 'uploads/default.jpg';
         // Vérification de la longueur et la complexité du mot de passe
         if (strlen($password) < 8) {
             log_error("Mot de passe trop court.");
@@ -90,9 +91,9 @@ try {
         }
 
         // Préparer et exécuter la requête avec PDO
-        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin) 
-        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :niveau, :points_experience, :admin)');
-
+        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil) 
+        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :niveau, :points_experience, :admin, :photo_profil)');
+        
         $stmt->execute([
             ':username'         => $username,
             ':password'         => $hashedPassword,  // Mot de passe haché
@@ -105,7 +106,8 @@ try {
             ':email'            => $email,
             ':niveau'           => $niveau,
             ':points_experience'=> $points_experience,
-            ':admin'            => $admin
+            ':admin'            => $admin,
+            ':photo_profil'     => $photo
         ]);
 
         // Récupérer l'ID du dernier utilisateur inséré

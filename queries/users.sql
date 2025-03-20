@@ -1,4 +1,7 @@
-DROP TABLE users;
+-- Suppression des tables si elles existent
+DROP TABLE IF EXISTS Acces, Historique_Actions, Administration, ObjetConnecte, NivUtilisateur, users;
+
+-- Création de la table des utilisateurs
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
@@ -12,24 +15,110 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     niveau ENUM('Débutant', 'Intermédiaire', 'Avancé', 'Expert') NOT NULL,
     points_experience INT NOT NULL DEFAULT 0,
-    admin BOOLEAN NOT NULL DEFAULT 0
+    date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    admin BOOLEAN NOT NULL DEFAULT 0,
+    photo_profil VARCHAR(255) DEFAULT 'default.jpg'
 );
 
--- Insérer un utilisateur avec email et mot de passe
-INSERT INTO users (
-    username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin
-) 
-VALUES (
-    'johndoe', 
-    '123',  -- Hachage MySQL (non recommandé)
-    'Doe', 
-    'John', 
-    '1990-05-15', 
-    34, 
-    'Homme', 
-    'élève', 
-    'admin@gmail.com', 
-    'Débutant', 
-    0, 
-    0
+-- Création de la table des accès
+CREATE TABLE Acces (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUtilisateur INT NOT NULL,
+    DateHeureAcces DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ActionsEffectuees TEXT,
+    PointsGagnes INT DEFAULT 0,
+    FOREIGN KEY (IDUtilisateur) REFERENCES users(id) ON DELETE CASCADE
 );
+
+
+
+
+
+-- Création de la table des objets connectés
+-- Création de la table des objets connectés avec la colonne UtilisateurID correctement définie
+CREATE TABLE ObjetConnecte (
+    ID INT AUTO_INCREMENT PRIMARY KEY,  
+    Nom VARCHAR(255) NOT NULL,  
+    Type VARCHAR(100) NOT NULL,  
+    Description TEXT,  
+    Marque VARCHAR(100),  
+    Etat ENUM('Actif', 'Inactif', 'Occupé', 'Libéré') NOT NULL,  
+    Connectivite VARCHAR(255) NOT NULL,  
+    EnergieUtilisee VARCHAR(100) NOT NULL,  
+    DerniereInteraction TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
+    DateAjout TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Luminosite DECIMAL(5,2) DEFAULT NULL,  
+    EtatLuminaire VARCHAR(50) DEFAULT NULL,  
+    LocalisationGPS VARCHAR(255) DEFAULT NULL,  
+    Vitesse DECIMAL(5,2) DEFAULT NULL,   
+    EtatBatterie INT DEFAULT NULL,
+    UtilisateurID INT DEFAULT NULL,  -- Ajout de la colonne UtilisateurID qui peut être NULL
+    FOREIGN KEY (UtilisateurID) REFERENCES users(id) ON DELETE SET NULL  -- Lien avec la table users, permettant UtilisateurID = NULL
+);
+
+
+-- Création de la table de l'historique des actions
+-- Création de la table de l'historique des actions
+CREATE TABLE Historique_Actions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_utilisateur INT NOT NULL,
+    id_objet_connecte INT NULL,  -- ✅ Correction ici : INT au lieu de VARCHAR(50)
+    type_action VARCHAR(255) NOT NULL,
+    date_heure DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_utilisateur) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_objet_connecte) REFERENCES ObjetConnecte(ID) ON DELETE SET NULL
+);
+
+
+-- Création de la table d'administration
+CREATE TABLE Administration (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    IDUtilisateur INT NOT NULL,
+    ActionsRealisees VARCHAR(255),
+    FOREIGN KEY (IDUtilisateur) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+
+-- Insertion d'un utilisateur test
+INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil)
+VALUES ('johndoe', '123', 'Doe', 'John', '1990-05-15', 34, 'Homme', 'élève', 'admin@gmail.com', 'Débutant', 100, 1, 'uploads/default.jpg');
+
+
+-- Insertion d'un utilisateur test
+INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil)
+VALUES 
+('janedoe', '123456', 'Doe', 'Jane', '1995-08-20', 28, 'Femme', 'développeur', 'jane.doe@example.com', 'Intermédiaire', 100, 1, 'uploads/default.jpg');
+
+
+
+
+-- Insertion d'un objet connecté avec un utilisateur spécifique
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
+VALUES ('Lampe intelligente', 'Éclairage', 'Lampe connectée avec réglage de lintensité', 'Philips', 'Actif', 'Wi-Fi', 'Électricité', 75.5, 'Allumé', '48.8566,2.3522', NULL, 95, 1); -- UtilisateurID = 1
+
+-- Insertion d'un autre objet connecté sans utilisateur (UtilisateurID = NULL)
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
+VALUES ('Caméra de sécurité', 'Surveillance', 'Caméra HD avec vision nocturne', 'Arlo', 'Actif', 'Wi-Fi', 'Batterie', NULL, NULL, '34.0522,-118.2437', NULL, 80, NULL); -- Pas d'utilisateur (UtilisateurID = NULL)
+
+
+
+-- Insertion d'un autre objet connecté avec un autre utilisateur
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
+VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '40.7128,-74.0060', NULL, 100, 1); -- UtilisateurID = 2
+
+
+-- Insertion de trois vélos
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie)
+VALUES 
+('Vélo Urbain 1000', 'Vélo', 'Vélo électrique pour la ville avec moteur de 250W.', 'Marque A', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 25.00, 100),
+('Vélo Sport 2000', 'Vélo', 'Vélo de sport avec transmission Shimano 21 vitesses.', 'Marque B', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 30.00, 95),
+('Vélo Cargo', 'Vélo', 'Vélo cargo pour transport de charges lourdes.', 'Marque C', 'Inactif', 'Bluetooth', 'Batterie NiMH', NOW(), 20.00, 80);
+
+-- Insertion de quatre trottinettes
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie)
+VALUES
+('Trottinette Electrique X1', 'Trottinette', 'Trottinette électrique avec moteur de 250W.', 'Marque D', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 15.00, 100),
+('Trottinette Electrique X2', 'Trottinette', 'Trottinette pour trajets urbains avec système de freinage électronique.', 'Marque E', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 18.00, 85),
+('Trottinette Sport T3', 'Trottinette', 'Trottinette sport avec roues renforcées.', 'Marque F', 'Occupé', 'Bluetooth', 'Batterie Lithium', NOW(), 20.00, 50),
+('Trottinette Connectée T4', 'Trottinette', 'Trottinette connectée avec suivi GPS et autonomie améliorée.', 'Marque G', 'Libéré', 'Wi-Fi', 'Batterie Li-ion', NOW(), 22.00, 90);

@@ -23,3 +23,16 @@
 [2025-03-10 13:50:10] Email déjà utilisé : admin55@gmai.com
 [2025-03-10 13:50:11] Email déjà utilisé : admin55@gmai.com
 [2025-03-10 14:33:38] Email invalide : damien@gmailcom
+[2025-03-11 14:32:06] Email invalide : admin5@gmailcom
+[2025-03-11 14:32:18] Email invalide : admin5@gmailcom
+[2025-03-11 14:32:30] Mot de passe trop court.
+[2025-03-11 14:32:40] Mot de passe trop court.
+[2025-03-19 14:00:45] Email invalide : admin5@gmailcom
+[2025-03-19 14:01:13] Mot de passe trop court.
+[2025-03-20 16:20:31] Email invalide : admin5@gmailcom
+[2025-03-20 16:21:21] Email invalide : admin5@gmailcom
+[2025-03-20 16:21:25] Email invalide : admin5@gmailcom
+[2025-03-20 16:21:41] Erreur interne : SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+[2025-03-20 16:23:03] Erreur interne : SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+[2025-03-20 16:23:37] Erreur interne : SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
+[2025-03-20 16:23:46] Erreur interne : SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
