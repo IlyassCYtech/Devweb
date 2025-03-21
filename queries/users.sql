@@ -1,5 +1,5 @@
 -- Suppression des tables si elles existent
-DROP TABLE IF EXISTS Acces, Historique_Actions, Administration, ObjetConnecte, NivUtilisateur, users;
+DROP TABLE IF EXISTS Acces, Historique_Actions, Administration, ObjetConnecte, NivUtilisateur, users, TypeObjet;
 
 -- Création de la table des utilisateurs
 CREATE TABLE users (
@@ -42,7 +42,7 @@ CREATE TABLE ObjetConnecte (
     Type VARCHAR(100) NOT NULL,  
     Description TEXT,  
     Marque VARCHAR(100),  
-    Etat ENUM('Actif', 'Inactif', 'Occupé', 'Libéré') NOT NULL,  
+    Etat ENUM('Actif', 'Inactif') NOT NULL,  
     Connectivite VARCHAR(255) NOT NULL,  
     EnergieUtilisee VARCHAR(100) NOT NULL,  
     DerniereInteraction TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
@@ -54,6 +54,11 @@ CREATE TABLE ObjetConnecte (
     EtatBatterie INT DEFAULT NULL,
     UtilisateurID INT DEFAULT NULL,  -- Ajout de la colonne UtilisateurID qui peut être NULL
     FOREIGN KEY (UtilisateurID) REFERENCES users(id) ON DELETE SET NULL  -- Lien avec la table users, permettant UtilisateurID = NULL
+);
+
+CREATE TABLE TypeObjet (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Nom VARCHAR(100) NOT NULL UNIQUE
 );
 
 
@@ -78,6 +83,10 @@ CREATE TABLE Administration (
     FOREIGN KEY (IDUtilisateur) REFERENCES users(id) ON DELETE CASCADE
 );
 
+INSERT INTO TypeObjet (Nom) VALUES 
+('Vélo'),
+('Trottinette'),
+('Helicoptaire');
 
 
 -- Insertion d'un utilisateur test
@@ -105,7 +114,7 @@ VALUES ('Caméra de sécurité', 'Surveillance', 'Caméra HD avec vision nocturn
 
 -- Insertion d'un autre objet connecté avec un autre utilisateur
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '40.7128,-74.0060', NULL, 100, 1); -- UtilisateurID = 2
+VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '40.7128,-74.0060', NULL, 100, 2); -- UtilisateurID = 2
 
 
 -- Insertion de trois vélos
@@ -120,5 +129,5 @@ INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, E
 VALUES
 ('Trottinette Electrique X1', 'Trottinette', 'Trottinette électrique avec moteur de 250W.', 'Marque D', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 15.00, 100),
 ('Trottinette Electrique X2', 'Trottinette', 'Trottinette pour trajets urbains avec système de freinage électronique.', 'Marque E', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 18.00, 85),
-('Trottinette Sport T3', 'Trottinette', 'Trottinette sport avec roues renforcées.', 'Marque F', 'Occupé', 'Bluetooth', 'Batterie Lithium', NOW(), 20.00, 50),
-('Trottinette Connectée T4', 'Trottinette', 'Trottinette connectée avec suivi GPS et autonomie améliorée.', 'Marque G', 'Libéré', 'Wi-Fi', 'Batterie Li-ion', NOW(), 22.00, 90);
+('Trottinette Sport T3', 'Trottinette', 'Trottinette sport avec roues renforcées.', 'Marque F', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 20.00, 50),
+('Trottinette Connectée T4', 'Trottinette', 'Trottinette connectée avec suivi GPS et autonomie améliorée.', 'Marque G', 'Inactif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 22.00, 90);

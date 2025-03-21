@@ -8,7 +8,10 @@ include('../includes/db_connect.php');
 try {
     // Vérifier si l'utilisateur est connecté
     if (!isset($_SESSION['user_id'])) {
-        die("Utilisateur non connecté.");
+        header("Location: ../public/index.php"); // Corrige la redirection
+
+  
+
     }
 
     // Récupérer l'ID de l'utilisateur depuis la session
@@ -103,7 +106,8 @@ try {
                     <a href="objets.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
                     <?php if ($user['admin']) : ?>
                         <a href="../admin/admin.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium">Admin</a>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                    <a href="recherche.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">🔍</a>
                 </div>
                 <a href="logout.php" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                     Déconnexion
@@ -238,7 +242,7 @@ try {
                         if ($action['objet_type'] == 'Trottinette') {
                             $image_src = '../assets/images/trottinette.jpg'; // Remplace par le chemin de l'image de la trottinette
                         } elseif ($action['objet_type'] == 'Vélo') {
-                            $image_src = '../assets/images/velo.jpg'; // Remplace par le chemin de l'image du vélo
+                            $image_src = '../assets/images/vélo.jpg'; // Remplace par le chemin de l'image du vélo
                         } else {
                             $image_src = '../assets/images/default.jpg'; // Image par défaut si aucun type ne correspond
                         }

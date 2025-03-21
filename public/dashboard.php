@@ -8,7 +8,7 @@ include('../includes/db_connect.php');
 try {
     // Vérifier si l'utilisateur est connecté
     if (!isset($_SESSION['user_id'])) {
-        die("Utilisateur non connecté.");
+        header("Location: ../public/index.php"); // Corrige la redirection
     }
 
     // Récupérer l'ID de l'utilisateur depuis la session
@@ -88,7 +88,6 @@ try {
 <body class="bg-gray-50">
     <!-- Navbar -->
     <nav class="glass-nav fixed w-full z-50 top-0">
-    <nav class="glass-nav fixed w-full z-50 top-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
 
@@ -99,12 +98,14 @@ try {
                 </div>
 
                 <div class="hidden sm:flex sm:items-center sm:justify-center flex-grow space-x-8">
-                   <a href="profil.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Profil</a>
+
+                    <a href="profil.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Profil</a>
                     <a href="dashboard.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Accueil</a>
                     <a href="objets.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
                     <?php if ($user['admin']) : ?>
                         <a href="../admin/admin.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium">Admin</a>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                    <a href="recherche.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">🔍</a>
                 </div>
                 <a href="logout.php" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                     Déconnexion

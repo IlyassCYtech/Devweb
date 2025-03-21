@@ -1,130 +1,44 @@
-document.addEventListener('DOMContentLoaded', () => UI.init());
+function assignObject(objectId, userId) {
+    // Crée un objet de données à envoyer
+ 
 
-const API_BASE_URL = '';
-
-const store = {
-    objects: [],
+    // Envoi des données via AJAX
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '../../public/assign_object.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     
-    async fetchObjects() {
-        try {
-            const response = await fetch(`${API_BASE_URL}/get_objects.php`);
-            const data = await response.json();
-            if (data.success) {
-                this.objects = data.data;
-                return data.data;
-            }
-            throw new Error(data.error);
-        } catch (error) {
-            console.error('Erreur lors de la récupération des objets:', error);
-        }
-    },
-    
-    async updateObjectState(objectId, newState) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/update_object.php`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: objectId, etat: newState })
-            });
-            const data = await response.json();
-            if (data.success) {
-                this.objects = this.objects.map(obj =>
-                    obj.id === objectId ? { ...obj, etat: newState } : obj
-                );
-                return true;
-            }
-            throw new Error(data.error);
-        } catch (error) {
-            console.error('Erreur mise à jour:', error);
-        }
-    },
+    // Paramètres à envoyer : ID de l'objet et ID de l'utilisateur
+    const params = 'objectId=' + objectId + '&userId=' + userId;
 
-    async deleteObject(objectId) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/delete_object.php`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: objectId })
-            });
-            const data = await response.json();
-            if (data.success) {
-                this.objects = this.objects.filter(obj => obj.id !== objectId);
-                return true;
-            }
-            throw new Error(data.error);
-        } catch (error) {
-            console.error('Erreur suppression:', error);
-        }
-    }
-};
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Lorsque la requête est terminée avec succès, recharge la page
+            if (window.location.pathname === "/public/objets.php") {
+                window.location.reload();
+            }        }
+    };
 
-const UI = {
-    init() {
-        this.refreshObjects();
-        setInterval(() => this.refreshObjects(), 30000);
+    xhr.send(params);
+}
 
-        document.addEventListener('click', (e) => {
-            if (e.target.matches('.delete-object')) {
-                this.handleDeleteObject(e.target.dataset.objectId);
-            }
-        });
+function returnObject(objectID, userId) {
+ // L'utilisateur connecté récupère son ID à partir de PHP
 
-        document.addEventListener('change', (e) => {
-            if (e.target.matches('.object-state-toggle')) {
-                this.handleStateChange(e.target.dataset.objectId, e.target.checked ? 'on' : 'off');
-            }
-        });
-    },
+// Demander la confirmation avant de rendre l'objet
+if (confirm("Êtes-vous sûr de vouloir rendre cet objet ?")) {
+    // Envoyer la requête AJAX pour mettre à jour l'objet dans la base de données
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "../../public/return_object.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    const params = 'objectID=' + objectID + '&userID=' + userId;  // Utilisation de objectID et userID
 
-    async refreshObjects() {
-        const objects = await store.fetchObjects();
-        this.renderObjects(objects);
-    },
-
-    renderObjects(objects) {
-        const container = document.getElementById('objectsList');
-        if (!container) return;
-        
-        container.innerHTML = objects.map(obj => `
-            <div class="p-6 bg-white rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold">${obj.nom}</h3>
-                <p class="text-gray-600">${obj.description}</p>
-                <div class="mt-4 flex justify-between items-center">
-                    <label class="flex items-center">
-                        <input type="checkbox" class="object-state-toggle"
-                               data-object-id="${obj.id}" ${obj.etat === 'on' ? 'checked' : ''}>
-                        <span class="ml-2">${obj.etat === 'on' ? 'Allumé' : 'Éteint'}</span>
-                    </label>
-                    <button class="delete-object bg-red-600 text-white px-3 py-1 rounded"
-                            data-object-id="${obj.id}">
-                        Supprimer
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    },
-
-    async handleStateChange(objectId, newState) {
-        try {
-            await store.updateObjectState(objectId, newState);
-            this.showSuccess('État mis à jour');
-        } catch (error) {
-            this.showError('Erreur mise à jour');
-            this.refreshObjects();
-        }
-    },
-
-    async handleDeleteObject(objectId) {
-        if (!confirm('Confirmer suppression ?')) return;
-        try {
-            await store.deleteObject(objectId);
-            this.showSuccess('Objet supprimé');
-            this.refreshObjects();
-        } catch (error) {
-            this.showError('Erreur suppression');
-        }
-    },
-
-    showSuccess(message) { console.log('✔️ ' + message); },
-    showError(message) { console.error('❌ ' + message); }
-};
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            // Si tout se passe bien, recharger la page pour mettre à jour les objets
+            if (window.location.pathname === "/public/objets.php") {
+                window.location.reload();
+            }        }
+    };
+    xhr.send(params);
+}
+}
