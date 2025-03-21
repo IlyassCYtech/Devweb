@@ -12,7 +12,7 @@ systeme photo a faire
 modification de profil a faire
 historique admin et historique general de connection à faire 
 gestion des niveau (niveau operationel mais pas les droits attribuer)
-systeme de recherche à faire
+systeme de recherche fait
 partie admin:
 - il manque toutes la gestions des objets
 - possiblite de voir les vue
