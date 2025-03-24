@@ -13,6 +13,11 @@ $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
+$typeStmt = $conn->prepare("SELECT * FROM TypeObjet");
+$typeStmt->execute();
+$types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
+
 if (!$user) {
     header("Location: ../public/index.php");
     exit();
@@ -77,9 +82,11 @@ if (!$user) {
             <div>
                 <label for="typeObjet" class="block text-sm font-medium text-gray-700">Type d'objet :</label>
                 <select id="typeObjet" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Tous</option>
-                    <option value="velo">Vélo</option>
-                    <option value="trottinette">Trottinette</option>
+                    <?php foreach ($types as $type): ?>
+                                <option value="<?= htmlspecialchars($type['Nom']) ?>">
+                                    <?= htmlspecialchars($type['Nom']) ?>
+                                </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div>
