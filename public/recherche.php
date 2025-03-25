@@ -82,6 +82,7 @@ if (!$user) {
             <div>
                 <label for="typeObjet" class="block text-sm font-medium text-gray-700">Type d'objet :</label>
                 <select id="typeObjet" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Tous</option>
                     <?php foreach ($types as $type): ?>
                                 <option value="<?= htmlspecialchars($type['Nom']) ?>">
                                     <?= htmlspecialchars($type['Nom']) ?>

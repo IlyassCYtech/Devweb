@@ -47,6 +47,7 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mes Objets | CY Tech</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         .glass-effect {
             background: rgba(255, 255, 255, 0.9);
@@ -81,6 +82,16 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
             height: 4px;
             background: linear-gradient(90deg, #667eea, #764ba2);
             border-radius: 2px;
+        }
+
+        .object-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .object-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -123,9 +134,10 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
             <h2 class="text-2xl font-semibold text-gray-800 section-header">Objets Utilisés</h2>
             <div id="usedObjects" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 <?php while ($object = $usedStmt->fetch(PDO::FETCH_ASSOC)) : ?>
-                    <div class="bg-white p-6 rounded-lg shadow-md relative card-hover glass-effect">
+                    <div class="bg-white p-6 rounded-lg shadow-md relative card-hover glass-effect object-card"
+                         onclick="window.location.href='modifier_objet.php?id=<?= $object['ID'] ?>'">
                         <button class="absolute top-4 right-4 text-red-600 hover:text-red-800 transition-colors duration-200" 
-                                onclick="returnObject(<?= $object['ID'] ?>, <?= $user['id'] ?>)">
+                                onclick="event.stopPropagation(); returnObject(<?= $object['ID'] ?>, <?= $user['id'] ?>)">
                             <span class="text-2xl">🔄</span>
                         </button>
                         <h3 class="font-semibold text-xl text-gray-800 mb-3"><?= htmlspecialchars($object['Nom']) ?></h3>
@@ -156,9 +168,10 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
             <h2 class="text-2xl font-semibold text-gray-800 section-header">Objets Disponibles</h2>
             <div id="availableObjects" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 <?php while ($object = $availableStmt->fetch(PDO::FETCH_ASSOC)) : ?>
-                    <div class="bg-white p-6 rounded-lg shadow-md relative card-hover glass-effect">
+                    <div class="bg-white p-6 rounded-lg shadow-md relative card-hover glass-effect object-card"
+                         onclick="window.location.href='modifier_objet.php?id=<?= $object['ID'] ?>'">
                         <button class="absolute top-4 right-4 text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                                onclick="assignObject(<?= $object['ID'] ?>, <?= $user['id'] ?>)">
+                                onclick="event.stopPropagation(); assignObject(<?= $object['ID'] ?>, <?= $user['id'] ?>)">
                             <span class="text-2xl">➕</span>
                         </button>
                         <h3 class="font-semibold text-xl text-gray-800 mb-3"><?= htmlspecialchars($object['Nom']) ?></h3>
