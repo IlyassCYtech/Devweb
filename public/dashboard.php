@@ -10,12 +10,11 @@ try {
     if (!isset($_SESSION['user_id'])) {
         header("Location: ../public/index.php"); // Corrige la redirection
     }
-
     // Récupérer l'ID de l'utilisateur depuis la session
     $user_id = $_SESSION['user_id'];
 
     // Récupérer les informations de l'utilisateur
-    $stmt = $conn->prepare("SELECT username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, admin FROM users WHERE id = :id");
+    $stmt = $conn->prepare("SELECT username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, is_confirmed  ,admin FROM users WHERE id = :id");
     $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
 
@@ -24,7 +23,11 @@ try {
     if (!$user) {
         die("Utilisateur non trouvé.");
     }
-
+    if ($_SESSION['is_confirmed'] != 1) {
+        // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
+        header("Location: confirm.php");
+        exit();
+    }
     // Récupérer le nombre total d'objets
     $stmt = $conn->query("SELECT COUNT(*) as total FROM ObjetConnecte");
     $total_objets = $stmt->fetch(PDO::FETCH_ASSOC)['total'];

@@ -7,7 +7,11 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: ../public/index.php");
     exit();
 }
-
+if ($_SESSION['is_confirmed'] != 1) {
+    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
+    header("Location: ../public/confirm.php");
+    exit();
+}
 $user_id = $_SESSION['user_id'];
 
 // Vérifier si l'utilisateur est admin

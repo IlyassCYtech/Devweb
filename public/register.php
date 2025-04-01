@@ -1,6 +1,5 @@
 <?php
 // Démarrer la session
-
 session_start();
 
 // Inclure la connexion à la DB
@@ -13,6 +12,12 @@ function log_error($message) {
     $logMessage = "[$timestamp] $message\n";
     file_put_contents($logFile, $logMessage, FILE_APPEND);
 }
+
+// Inclure PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php';
 
 try {
     // Vérifier si le formulaire est soumis
@@ -45,9 +50,10 @@ try {
 
         $type_membre = trim($_POST['type_membre']);
         $niveau = trim($_POST['niveau']);
-        $points_experience = (int)$_POST['points_experience'];
+        $points_experience = (int)$_POST['  points_experience'];
         $admin = isset($_POST['admin']) ? (int)$_POST['admin'] : 0;
-        $photo = 'uploads/default.jpg';
+        $photo = 'default.jpg';
+
         // Vérification de la longueur et la complexité du mot de passe
         if (strlen($password) < 8) {
             log_error("Mot de passe trop court.");
@@ -90,9 +96,12 @@ try {
             exit();
         }
 
+        // Générer un code de confirmation aléatoire
+        $confirmationCode = bin2hex(random_bytes(16));
+
         // Préparer et exécuter la requête avec PDO
-        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil) 
-        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :niveau, :points_experience, :admin, :photo_profil)');
+        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil, confirmation_code, is_confirmed) 
+        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :niveau, :points_experience, :admin, :photo_profil, :confirmation_code, 0)');
         
         $stmt->execute([
             ':username'         => $username,
@@ -107,7 +116,8 @@ try {
             ':niveau'           => $niveau,
             ':points_experience'=> $points_experience,
             ':admin'            => $admin,
-            ':photo_profil'     => $photo
+            ':photo_profil'     => $photo,
+            ':confirmation_code'=> $confirmationCode // Ajouter le code de confirmation
         ]);
 
         // Récupérer l'ID du dernier utilisateur inséré
@@ -116,8 +126,37 @@ try {
         // Enregistrer l'ID de l'utilisateur dans la session
         $_SESSION['user_id'] = $user_id;
 
+        // Envoi de l'email de confirmation
+        $mail = new PHPMailer(true);
+
+        // Paramètres SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.mailtrap.io';  // Remplacer par votre SMTP
+        $mail->SMTPAuth = true;
+        $mail->Username = '04abe8c7d2cd06'; // Remplacer par votre email
+        $mail->Password = 'cd48fdee9c6933';  // Remplacer par votre mot de passe
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Expéditeur et destinataire
+        $mail->setFrom('votre_email@mailtrap.io', 'Nom de votre site');
+        $mail->addAddress($email);
+
+        // Contenu de l'email
+        $mail->isHTML(true);
+        $mail->Subject = 'Code de confirmation';
+        $confirmationLink = "http://localhost:3000/public/confirm.php?code=" . $confirmationCode;
+        $mail->Body = "Voici votre code de confirmation : <a href='$confirmationLink'>Cliquez ici pour confirmer votre inscription</a>";
+
+        // Envoyer l'email
+        if (!$mail->send()) {
+            log_error("Erreur lors de l'envoi de l'email.");
+            echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'envoi de l\'email.']);
+            exit();
+        }
+
         // Retourner une réponse JSON avec succès
-        echo json_encode(['success' => true, 'message' => 'Utilisateur ajouté avec succès']);
+        echo json_encode(['success' => true, 'message' => 'Utilisateur ajouté avec succès. Veuillez vérifier votre email pour confirmer votre inscription.']);
         exit();
     } else {
         log_error("Méthode de requête non valide.");
@@ -128,5 +167,9 @@ try {
     // Si une erreur PDO survient
     log_error("Erreur interne : " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Erreur interne.']);
+    exit();
+} catch (Exception $e) {
+    log_error("Erreur dans PHPMailer : " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Erreur dans PHPMailer.']);
     exit();
 }

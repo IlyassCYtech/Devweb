@@ -8,7 +8,11 @@ if (!isset($_SESSION['user_id'])) {
     echo json_encode(['error' => 'Utilisateur non authentifié.']);
     exit();
 }
-
+if ($_SESSION['is_confirmed'] != 1) {
+    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
+    header("Location: confirm.php");
+    exit();
+}
 $user_id = $_SESSION['user_id'];
 
 // Récupération des filtres

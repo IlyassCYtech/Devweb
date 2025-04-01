@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT username, id, admin FROM users WHERE id = :id");
+$stmt = $conn->prepare("SELECT username, id, admin, is_confirmed,photo_profil FROM users WHERE id = :id");
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -21,6 +21,19 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
 if (!$user) {
     header("Location: ../public/index.php");
     exit();
+}
+if ($_SESSION['is_confirmed'] != 1) {
+    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
+    header("Location: confirm.php");
+    exit();
+}
+
+
+$profilePicPath = "../uploads/{$userId}." . pathinfo($user['photo_profil'], PATHINFO_EXTENSION);
+
+// Vérifier si le fichier existe
+if (!file_exists($profilePicPath)) {
+    $profilePicPath = "../uploads/default.jpg"; // Image par défaut
 }
 ?>
 
@@ -175,8 +188,12 @@ if (!$user) {
                 data.forEach(user => {
                     const userCard = document.createElement("div");
                     userCard.className = "flex items-center bg-white p-4 shadow rounded-lg mb-4";
+
+                    // Utilisation du chemin de la photo de profil de chaque utilisateur
+                    const profilePic = user.profile_pic_path;
+
                     userCard.innerHTML = `
-                        <img src="../${user.profile_pic}" alt="Photo de profil" class="w-12 h-12 rounded-full mr-4">
+                        <img src="${profilePic}" alt="Photo de profil" class="w-12 h-12 rounded-full mr-4">
                         <div>
                             <p class="text-lg font-semibold">${user.username}</p>
                             <p class="text-gray-600">${user.first_name} ${user.last_name}</p>
@@ -189,6 +206,7 @@ if (!$user) {
                 resultsContainer.innerHTML = "<p class='text-red-500'>Erreur lors de la recherche.</p>";
             });
     }
+
 
     function searchObject() {
     const typeObjet = document.getElementById("typeObjet").value;

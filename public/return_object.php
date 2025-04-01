@@ -6,7 +6,7 @@ include('../includes/db_connect.php');
 if (isset($_POST['objectID']) && isset($_POST['userID'])) {
     $objectID = $_POST['objectID'];
     $userID = $_POST['userID'];
-
+    
     try {
         // Commencer une transaction pour garantir la cohérence des données
         $conn->beginTransaction();

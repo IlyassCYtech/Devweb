@@ -37,3 +37,20 @@
 [2025-03-20 16:23:37] Erreur interne : SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
 [2025-03-20 16:23:46] Erreur interne : SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
 [2025-03-24 09:12:09] Mot de passe trop court.
+[2025-03-25 08:43:24] Mot de passe trop court.
+[2025-03-25 08:43:32] Mot de passe trop simple.
+[2025-03-28 09:59:23] Mot de passe trop court.
+[2025-03-28 09:59:35] Mot de passe trop simple.
+[2025-03-28 19:16:02] Échec de l'envoi de l'email de confirmation.
+[2025-03-28 19:25:25] Pseudonyme déjà utilisé : a
+[2025-03-28 19:25:31] Email déjà utilisé : bantosdamien@gmail.com
+[2025-03-28 19:25:44] Erreur interne : SQLSTATE[HY000]: General error: 1364 Field 'confirmation_code' doesn't have a default value
+[2025-03-28 19:25:46] Erreur interne : SQLSTATE[HY000]: General error: 1364 Field 'confirmation_code' doesn't have a default value
+[2025-03-28 19:34:14] Pseudonyme déjà utilisé : aa
+[2025-03-28 19:34:34] Pseudonyme déjà utilisé : aadq
+[2025-03-28 20:08:17] Pseudonyme déjà utilisé : az
+[2025-03-28 20:11:47] Pseudonyme déjà utilisé : aze
+[2025-03-29 13:54:45] Pseudonyme déjà utilisé : qdqsz
+[2025-03-29 13:59:00] Mot de passe trop court.
+[2025-03-29 13:59:09] Email déjà utilisé : a@gmail.com
+[2025-03-31 15:09:26] Pseudonyme déjà utilisé : asad

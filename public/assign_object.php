@@ -7,7 +7,11 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
-
+if ($_SESSION['is_confirmed'] != 1) {
+    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
+    header("Location: confirm.php");
+    exit();
+}
 // Vérifier si l'ID de l'objet et de l'utilisateur sont envoyés
 if (isset($_POST['objectId']) && isset($_POST['userId'])) {
     $objectId = $_POST['objectId'];

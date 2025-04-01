@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Récupérer les informations de l'utilisateur
-$stmt = $conn->prepare("SELECT id, username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, admin FROM users WHERE id = :id");
+$stmt = $conn->prepare("SELECT id, username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, is_confirmed,admin FROM users WHERE id = :id");
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -21,7 +21,11 @@ if (!$user) {
     header("Location: ../public/index.php");
     die("Utilisateur non trouvé.");
 }
-
+if ($_SESSION['is_confirmed'] != 1) {
+    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
+    header("Location: confirm.php");
+    exit();
+}
 // Récupérer le statut admin
 $isAdmin = $user['admin'] ?? 0;
 
