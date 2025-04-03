@@ -139,6 +139,9 @@ try {
             <div class="glass-card rounded-2xl p-6 mb-8">
                 <div class="flex justify-between items-center">
                     <h1 class="text-3xl font-bold text-gray-900">Panel Administrateur</h1>
+                    <a href="backup_db.php" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                        Sauvegarder la Base de Données
+                    </a>
                 </div>
             </div>
 
@@ -190,6 +193,18 @@ try {
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <!-- Bouton pour restaurer la base de données -->
+            <div class="glass-card rounded-2xl p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Restaurer la Base de Données</h2>
+                <form action="restore_db.php" method="POST" enctype="multipart/form-data">
+                    <label for="sqlFile" class="block text-sm font-medium text-gray-700">Choisir un fichier .sql :</label>
+                    <input type="file" name="sqlFile" id="sqlFile" accept=".sql" class="mt-2 mb-4 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="submit" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                        Restaurer la Base de Données
+                    </button>
+                </form>
             </div>
 
             <!-- Objects Section -->
