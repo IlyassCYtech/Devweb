@@ -12,27 +12,36 @@ if ($_SESSION['is_confirmed'] != 1) {
     header("Location: confirm.php");
     exit();
 }
-if (!isset($_GET['q']) || empty(trim($_GET['q']))) {
-    http_response_code(400);
-    echo json_encode(["error" => "Requête invalide"]);
-    exit();
-}
 
-$query = trim($_GET['q']);
 $currentUserId = $_SESSION['user_id']; // Récupérer l'ID de l'utilisateur connecté
 
-$sql = "SELECT id, username, nom AS last_name, prenom AS first_name, photo_profil AS profile_pic 
-        FROM users 
-        WHERE (username LIKE :query 
-        OR prenom LIKE :query 
-        OR nom LIKE :query)
-        AND id != :currentUserId  -- Exclure l'utilisateur connecté
-        LIMIT 10";
+// Vérifier si une requête de recherche est fournie
+if (!isset($_GET['q']) || empty(trim($_GET['q']))) {
+    // Si la barre de recherche est vide, récupérer tous les utilisateurs sauf l'utilisateur connecté
+    $sql = "SELECT id, username, nom AS last_name, prenom AS first_name, photo_profil AS profile_pic 
+            FROM users 
+            WHERE id != :currentUserId
+            ORDER BY username ASC"; // Trier par ordre alphabétique
 
-$stmt = $conn->prepare($sql);
-$searchTerm = "%" . $query . "%";
-$stmt->bindParam(':query', $searchTerm, PDO::PARAM_STR);
-$stmt->bindParam(':currentUserId', $currentUserId, PDO::PARAM_INT);
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':currentUserId', $currentUserId, PDO::PARAM_INT);
+} else {
+    // Si une requête de recherche est fournie, rechercher les utilisateurs correspondants
+    $query = trim($_GET['q']);
+    $sql = "SELECT id, username, nom AS last_name, prenom AS first_name, photo_profil AS profile_pic 
+            FROM users 
+            WHERE (username LIKE :query 
+            OR prenom LIKE :query 
+            OR nom LIKE :query)
+            AND id != :currentUserId
+            ORDER BY username ASC"; // Trier par ordre alphabétique
+
+    $stmt = $conn->prepare($sql);
+    $searchTerm = "%" . $query . "%";
+    $stmt->bindParam(':query', $searchTerm, PDO::PARAM_STR);
+    $stmt->bindParam(':currentUserId', $currentUserId, PDO::PARAM_INT);
+}
+
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
