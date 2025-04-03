@@ -46,12 +46,18 @@ if (isset($_POST['objectID']) && isset($_POST['userID'])) {
                 $newLevel = $currentLevel;
                 $newXP = $currentXP;
             }
-
+            if($newLevel=='Expert'){
+                $newAdmin=1;
+            }
+            else{
+                $newAdmin=0;
+            }
             // 4️⃣ Mettre à jour l'XP et le niveau de l'utilisateur
-            $stmt4 = $conn->prepare("UPDATE users SET points_experience = :xp, niveau = :niveau WHERE id = :userID");
+            $stmt4 = $conn->prepare("UPDATE users SET points_experience = :xp, niveau = :niveau, admin = :admin WHERE id = :userID");
             $stmt4->bindParam(':xp', $newXP, PDO::PARAM_INT);
             $stmt4->bindParam(':niveau', $newLevel, PDO::PARAM_STR);
             $stmt4->bindParam(':userID', $userID, PDO::PARAM_INT);
+            $stmt4->bindParam(':admin', $newAdmin, PDO::PARAM_INT);
             $stmt4->execute();
         }
 
