@@ -169,22 +169,24 @@ if (!file_exists($profilePicPath)) {
 
     function searchUser() {
         const query = searchInput.value.trim();
-        if (query === "") {
-            resultsContainer.innerHTML = "<p class='text-red-500'>Veuillez entrer un terme de recherche.</p>";
-            return;
-        }
 
+        // Afficher un message de chargement
         resultsContainer.innerHTML = "<p class='text-blue-600'>🔍 Recherche en cours...</p>";
 
+        // Effectuer une requête à `search_user.php` avec le contenu de la barre de recherche
         fetch(`search_user.php?q=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
+                // Effacer les résultats précédents
                 resultsContainer.innerHTML = "";
+
+                // Si aucun utilisateur n'est trouvé
                 if (data.length === 0) {
                     resultsContainer.innerHTML = "<p class='text-gray-500'>Aucun utilisateur trouvé.</p>";
                     return;
                 }
 
+                // Afficher les utilisateurs trouvés
                 data.forEach(user => {
                     const userCard = document.createElement("div");
                     userCard.className = "flex items-center bg-white p-4 shadow rounded-lg mb-4";
@@ -203,9 +205,11 @@ if (!file_exists($profilePicPath)) {
                 });
             })
             .catch(error => {
+                // Afficher un message d'erreur en cas de problème
                 resultsContainer.innerHTML = "<p class='text-red-500'>Erreur lors de la recherche.</p>";
             });
     }
+
 
 
     function searchObject() {
