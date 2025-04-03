@@ -45,6 +45,12 @@ try {
     // Récupérer tous les objets connectés
     $stmtObjects = $pdo->query("SELECT * FROM ObjetConnecte ORDER BY ID ASC");
     $objects = $stmtObjects->fetchAll(PDO::FETCH_ASSOC);
+
+    // Récupérer les fichiers .sql du dossier backups/
+    $backupFiles = array_diff(scandir('../backups/'), array('.', '..'));
+    $sqlFiles = array_filter($backupFiles, function($file) {
+        return pathinfo($file, PATHINFO_EXTENSION) === 'sql';
+    });
 } catch (PDOException $e) {
     log_error("Erreur lors de la récupération des données: " . $e->getMessage());
     die("Erreur interne, veuillez réessayer plus tard.");
@@ -198,10 +204,15 @@ try {
             <!-- Bouton pour restaurer la base de données -->
             <div class="glass-card rounded-2xl p-6 mb-8">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-6">Restaurer la Base de Données</h2>
-                <form action="restore_db.php" method="POST" enctype="multipart/form-data">
+                <form id="restoreForm" action="restore_db.php" method="POST">
                     <label for="sqlFile" class="block text-sm font-medium text-gray-700">Choisir un fichier .sql :</label>
-                    <input type="file" name="sqlFile" id="sqlFile" accept=".sql" class="mt-2 mb-4 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <button type="submit" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                    <select name="sqlFile" id="sqlFile" class="mt-2 mb-4 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="" disabled selected>- Choisissez un fichier -</option>
+                        <?php foreach ($sqlFiles as $file): ?>
+                            <option value="<?= htmlspecialchars($file) ?>"><?= htmlspecialchars($file) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="button" id="restoreButton" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
                         Restaurer la Base de Données
                     </button>
                 </form>
@@ -376,6 +387,21 @@ try {
                     .catch(error => console.error("Erreur:", error));
                 }
             });
+        });
+
+        // Confirmation popup for restoring the database
+        const restoreButton = document.getElementById("restoreButton");
+        const restoreForm = document.getElementById("restoreForm");
+
+        restoreButton.addEventListener("click", function () {
+            const selectedFile = document.getElementById("sqlFile").value;
+            if (!selectedFile) {
+                alert("Veuillez sélectionner un fichier .sql avant de continuer.");
+                return;
+            }
+            if (confirm("Êtes-vous sûr de vouloir restaurer la base de données ? Cette action est irréversible.")) {
+                restoreForm.submit();
+            }
         });
     });
     </script>

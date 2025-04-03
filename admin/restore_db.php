@@ -38,64 +38,63 @@ try {
     log_error("Erreur lors de la récupération des données: " . $e->getMessage());
     die("Erreur interne, veuillez réessayer plus tard.");
 }
-// Vérifier si un fichier a été téléchargé
-if ($_FILES['sqlFile']['error'] === UPLOAD_ERR_OK) {
-    $fileTmpPath = $_FILES['sqlFile']['tmp_name'];
-    $fileName = $_FILES['sqlFile']['name'];
 
-    // Vérifier l'extension du fichier
-    $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-    if ($fileExtension !== 'sql') {
-        die("Erreur : Le fichier téléchargé n'est pas un fichier .sql.<br>");
+// Vérifier si un fichier a été sélectionné
+if (!isset($_POST['sqlFile']) || empty($_POST['sqlFile'])) {
+    die("Erreur : Aucun fichier n'a été sélectionné.");
+}
+
+$sqlFile = $_POST['sqlFile'];
+$filePath = "../backups/" . basename($sqlFile);
+
+if (!file_exists($filePath)) {
+    die("Erreur : Le fichier sélectionné n'existe pas.");
+}
+
+// Lire le contenu du fichier SQL
+$sql = file_get_contents($filePath);
+if (!$sql) {
+    die("Erreur : Impossible de lire le fichier SQL.<br>");
+}
+
+// Séparer les requêtes SQL si le fichier contient plusieurs instructions
+$queries = explode(";", $sql);
+
+try {
+    // Désactiver les contraintes de clé étrangère
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+
+    // Démarrer une transaction
+    if (!$pdo->inTransaction()) {
+        $pdo->beginTransaction();
     }
 
-    // Lire le contenu du fichier SQL
-    $sql = file_get_contents($fileTmpPath);
-    if (!$sql) {
-        die("Erreur : Impossible de lire le fichier SQL.<br>");
+    foreach ($queries as $query) {
+        $query = trim($query);
+        if (!empty($query)) {
+            $pdo->exec($query); // Exécuter chaque requête
+        }
     }
 
-    // Séparer les requêtes SQL si le fichier contient plusieurs instructions
-    $queries = explode(";", $sql);
-
-    try {
-        // Désactiver les contraintes de clé étrangère
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-
-        // Démarrer une transaction
-        if (!$pdo->inTransaction()) {
-            $pdo->beginTransaction();
-        }
-
-        foreach ($queries as $query) {
-            $query = trim($query);
-            if (!empty($query)) {
-                $pdo->exec($query); // Exécuter chaque requête
-            }
-        }
-
-        // Valider la transaction
-        if ($pdo->inTransaction()) {
-            $pdo->commit();
-        }
-
-        // Réactiver les contraintes de clé étrangère
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
-
-        echo "Base de données restaurée avec succès !<br>";
-        header('Location: ../admin/admin.php');
-    } catch (PDOException $e) {
-        // Vérifier si une transaction est active avant d'appeler rollBack()
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-
-        // Réactiver les contraintes de clé étrangère en cas d'erreur
-        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
-
-        die("Erreur lors de la restauration de la base de données : " . $e->getMessage());
+    // Valider la transaction
+    if ($pdo->inTransaction()) {
+        $pdo->commit();
     }
-} else {
-    die("Erreur : Aucun fichier n'a été téléchargé.<br>");
+
+    // Réactiver les contraintes de clé étrangère
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+
+    echo "Base de données restaurée avec succès !<br>";
+    header('Location: ../admin/admin.php');
+} catch (PDOException $e) {
+    // Vérifier si une transaction est active avant d'appeler rollBack()
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    // Réactiver les contraintes de clé étrangère en cas d'erreur
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+
+    die("Erreur lors de la restauration de la base de données : " . $e->getMessage());
 }
 ?>
