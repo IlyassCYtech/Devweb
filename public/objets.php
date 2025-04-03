@@ -21,9 +21,8 @@ if (!$user) {
     header("Location: ../public/index.php");
     die("Utilisateur non trouvé.");
 }
-if ($_SESSION['is_confirmed'] != 1) {
-    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
-    header("Location: confirm.php");
+if ($_SESSION['is_confirmed'] != 1 || $_SESSION['is_confirmed_by_ad'] != 1) {
+    header("Location: index.php");
     exit();
 }
 // Récupérer le statut admin

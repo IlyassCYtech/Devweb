@@ -7,9 +7,8 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: ../public/index.php");
     exit();
 }
-if ($_SESSION['is_confirmed'] != 1) {
-    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
-    header("Location: confirm.php");
+if ($_SESSION['is_confirmed'] != 1 || $_SESSION['is_confirmed_by_ad'] != 1) {
+    header("Location: index.php");
     exit();
 }
 $user_id = $_SESSION['user_id'];

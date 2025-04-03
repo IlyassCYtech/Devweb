@@ -19,7 +19,8 @@ CREATE TABLE users (
     admin BOOLEAN NOT NULL DEFAULT 0,
     photo_profil VARCHAR(255) DEFAULT 'default.jpg',
     confirmation_code VARCHAR(255) DEFAULT NULL,
-    is_confirmed INT DEFAULT 0
+    is_confirmed INT DEFAULT 0,
+    is_confirmed_by_ad INT DEFAULT 0
 );
 
 -- Création de la table des accès
@@ -93,14 +94,14 @@ INSERT INTO TypeObjet (Nom) VALUES
 
 
 -- Insertion d'un utilisateur test
-INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil,confirmation_code,is_confirmed)
-VALUES ('johndoe', '123', 'Doe', 'John', '1990-05-15', 34, 'Homme', 'élève', 'admin@gmail.com', 'Débutant', 100, 1, 'uploads/default.jpg',000000,1);
+INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil,confirmation_code,is_confirmed,is_confirmed_by_ad)
+VALUES ('johndoe', '123', 'Doe', 'John', '1990-05-15', 34, 'Homme', 'élève', 'admin@gmail.com', 'Débutant', 100, 1, 'uploads/default.jpg',000000,1,1);
 
 
 -- Insertion d'un utilisateur test
-INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil,confirmation_code,is_confirmed)
+INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil,confirmation_code,is_confirmed,is_confirmed_by_ad)
 VALUES 
-('janedoe', '123456', 'Doe', 'Jane', '1995-08-20', 28, 'Femme', 'développeur', 'jane.doe@example.com', 'Intermédiaire', 100, 1, 'uploads/default.jpg',000001,1);
+('janedoe', '123456', 'Doe', 'Jane', '1995-08-20', 28, 'Femme', 'développeur', 'jane.doe@example.com', 'Intermédiaire', 100, 1, 'uploads/default.jpg',000001,1,1);
 
 
 

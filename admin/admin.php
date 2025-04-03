@@ -19,9 +19,8 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: ../public/index.php");
     exit();
 }
-if ($_SESSION['is_confirmed'] != 1) {
-    // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
-    header("Location: ../public/confirm.php");
+if ($_SESSION['is_confirmed'] != 1 || $_SESSION['is_confirmed_by_ad'] != 1) {
+    header("Location: index.php");
     exit();
 }
 $user_id = $_SESSION['user_id'];
@@ -46,11 +45,9 @@ try {
     $stmtObjects = $pdo->query("SELECT * FROM ObjetConnecte ORDER BY ID ASC");
     $objects = $stmtObjects->fetchAll(PDO::FETCH_ASSOC);
 
-    // Récupérer les fichiers .sql du dossier backups/
-    $backupFiles = array_diff(scandir('../backups/'), array('.', '..'));
-    $sqlFiles = array_filter($backupFiles, function($file) {
-        return pathinfo($file, PATHINFO_EXTENSION) === 'sql';
-    });
+    // Récupérer les utilisateurs en attente de validation par l'admin (is_confirmed_by_ad = 0)
+    $stmtPendingUsers = $pdo->query("SELECT * FROM users WHERE is_confirmed_by_ad = 0 ORDER BY id ASC");
+    $pendingUsers = $stmtPendingUsers->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     log_error("Erreur lors de la récupération des données: " . $e->getMessage());
     die("Erreur interne, veuillez réessayer plus tard.");
@@ -145,9 +142,14 @@ try {
             <div class="glass-card rounded-2xl p-6 mb-8">
                 <div class="flex justify-between items-center">
                     <h1 class="text-3xl font-bold text-gray-900">Panel Administrateur</h1>
-                    <a href="backup_db.php" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
-                        Sauvegarder la Base de Données
-                    </a>
+                    <div class="flex space-x-4">
+                        <a href="backup_db.php" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                            Sauvegarder la Base de Données
+                        </a>
+                        <a href="admin_objet.php" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                            Gérer les Objets
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -201,18 +203,52 @@ try {
                 </div>
             </div>
 
+            <!-- Section des utilisateurs en attente de validation par l'admin -->
+            <div class="glass-card rounded-2xl p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Utilisateurs en attente de validation par l'admin</h2>
+                <div class="table-container bg-white">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom d'utilisateur</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validation Email</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($pendingUsers as $user) : ?>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($user['id']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?= htmlspecialchars($user['username']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($user['nom']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($user['prenom']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($user['email']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <?= $user['is_confirmed'] == 1 ? '✅ Validé' : '❌ Non validé' ?>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="btn-approve btn-hover inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" data-id="<?= $user['id'] ?>">
+                                            Approuver
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Bouton pour restaurer la base de données -->
             <div class="glass-card rounded-2xl p-6 mb-8">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-6">Restaurer la Base de Données</h2>
-                <form id="restoreForm" action="restore_db.php" method="POST">
+                <form action="restore_db.php" method="POST" enctype="multipart/form-data">
                     <label for="sqlFile" class="block text-sm font-medium text-gray-700">Choisir un fichier .sql :</label>
-                    <select name="sqlFile" id="sqlFile" class="mt-2 mb-4 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="" disabled selected>- Choisissez un fichier -</option>
-                        <?php foreach ($sqlFiles as $file): ?>
-                            <option value="<?= htmlspecialchars($file) ?>"><?= htmlspecialchars($file) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <button type="button" id="restoreButton" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                    <input type="file" name="sqlFile" id="sqlFile" accept=".sql" class="mt-2 mb-4 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="submit" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
                         Restaurer la Base de Données
                     </button>
                 </form>
@@ -389,19 +425,32 @@ try {
             });
         });
 
-        // Confirmation popup for restoring the database
-        const restoreButton = document.getElementById("restoreButton");
-        const restoreForm = document.getElementById("restoreForm");
+        // Approve user functionality
+        document.querySelectorAll(".btn-approve").forEach(button => {
+            button.addEventListener("click", function () {
+                const userId = this.dataset.id;
 
-        restoreButton.addEventListener("click", function () {
-            const selectedFile = document.getElementById("sqlFile").value;
-            if (!selectedFile) {
-                alert("Veuillez sélectionner un fichier .sql avant de continuer.");
-                return;
-            }
-            if (confirm("Êtes-vous sûr de vouloir restaurer la base de données ? Cette action est irréversible.")) {
-                restoreForm.submit();
-            }
+                if (confirm("Êtes-vous sûr de vouloir approuver cet utilisateur ?")) {
+                    fetch("approve_user.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `id=${userId}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            location.reload(); // Recharger la page pour mettre à jour la liste
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erreur:", error);
+                        alert("Une erreur est survenue lors de l'approbation de l'utilisateur.");
+                    });
+                }
+            });
         });
     });
     </script>

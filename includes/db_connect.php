@@ -12,27 +12,26 @@ try {
         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4" // Encodage UTF-8
     ]);
 
-    
-
-    
     // Vérifier si la base de données existe
     $stmt = $conn->query("SHOW DATABASES LIKE '$database'");
     $dbExists = $stmt->fetch();
 
     if($dbExists === false){
-     //Créer la base de données
-       $conn->exec("CREATE DATABASE $database");
-     echo "Base de données '$database' créée avec succès.<br>";
+        //Créer la base de données
+        $conn->exec("CREATE DATABASE $database");
+        echo "Base de données '$database' créée avec succès.<br>";
     }
 
     // Se connecter à la base de données
     $conn->exec("USE $database");
 
+    // Définir $pdo
+    $pdo = new PDO("mysql:host=$host;dbname=$database;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
 } catch (PDOException $e) {
     die("Erreur de connexion : " . $e->getMessage());
 }
-
-
 
 // Retourner la connexion PDO
 return $conn;

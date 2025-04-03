@@ -100,8 +100,8 @@ try {
         $confirmationCode = bin2hex(random_bytes(16));
 
         // Préparer et exécuter la requête avec PDO
-        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil, confirmation_code, is_confirmed) 
-        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :niveau, :points_experience, :admin, :photo_profil, :confirmation_code, 0)');
+        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil, confirmation_code, is_confirmed, is_confirmed_by_ad) 
+        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :niveau, :points_experience, :admin, :photo_profil, :confirmation_code, 0, 0)');
         
         $stmt->execute([
             ':username'         => $username,

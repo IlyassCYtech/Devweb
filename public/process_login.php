@@ -19,7 +19,7 @@ try {
         }
 
         // Préparer la requête pour récupérer l'utilisateur par email
-        $stmt = $conn->prepare("SELECT id, username, password ,is_confirmed FROM users WHERE email = :email");
+        $stmt = $conn->prepare("SELECT id, username, password ,is_confirmed,is_confirmed_by_ad FROM users WHERE email = :email");
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
 
@@ -41,6 +41,7 @@ try {
         $_SESSION['email'] = $email;
         $_SESSION['username'] = $user['username'];
         $_SESSION['is_confirmed']=$user['is_confirmed'];
+        $_SESSION['is_confirmed_by_ad'] = $user['is_confirmed_by_ad'];
 
         // Réponse JSON pour indiquer une connexion réussie
         echo json_encode(['success' => true, 'message' => 'Connexion réussie']);

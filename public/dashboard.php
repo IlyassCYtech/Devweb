@@ -5,11 +5,19 @@ session_start();
 // Inclure la connexion à la base de données
 include('../includes/db_connect.php');
 
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+// Vérifier si l'utilisateur est confirmé par email et par l'admin
+if ($_SESSION['is_confirmed'] != 1 || $_SESSION['is_confirmed_by_ad'] != 1) {
+    header("Location: index.php");
+    exit();
+}
+
 try {
-    // Vérifier si l'utilisateur est connecté
-    if (!isset($_SESSION['user_id'])) {
-        header("Location: ../public/index.php"); // Corrige la redirection
-    }
     // Récupérer l'ID de l'utilisateur depuis la session
     $user_id = $_SESSION['user_id'];
 
@@ -23,11 +31,7 @@ try {
     if (!$user) {
         die("Utilisateur non trouvé.");
     }
-    if ($_SESSION['is_confirmed'] != 1) {
-        // Si l'utilisateur n'est pas confirmé, le rediriger vers la page de confirmation
-        header("Location: confirm.php");
-        exit();
-    }
+
     // Récupérer le nombre total d'objets
     $stmt = $conn->query("SELECT COUNT(*) as total FROM ObjetConnecte");
     $total_objets = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
