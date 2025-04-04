@@ -38,19 +38,20 @@ try {
     log_error("Erreur lors de la récupération des données: " . $e->getMessage());
     die("Erreur interne, veuillez réessayer plus tard.");
 }
-// Vérifier si un fichier a été téléchargé
-if ($_FILES['sqlFile']['error'] === UPLOAD_ERR_OK) {
-    $fileTmpPath = $_FILES['sqlFile']['tmp_name'];
-    $fileName = $_FILES['sqlFile']['name'];
 
-    // Vérifier l'extension du fichier
-    $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-    if ($fileExtension !== 'sql') {
-        die("Erreur : Le fichier téléchargé n'est pas un fichier .sql.<br>");
+// Vérifier si un fichier a été sélectionné
+if (isset($_POST['sqlFile'])) {
+    $backupDir = '../backups/';
+    $fileName = basename($_POST['sqlFile']); // Sécuriser le nom du fichier
+    $filePath = $backupDir . $fileName;
+
+    // Vérifier si le fichier existe
+    if (!file_exists($filePath)) {
+        die("Erreur : Le fichier sélectionné n'existe pas.<br>");
     }
 
     // Lire le contenu du fichier SQL
-    $sql = file_get_contents($fileTmpPath);
+    $sql = file_get_contents($filePath);
     if (!$sql) {
         die("Erreur : Impossible de lire le fichier SQL.<br>");
     }
@@ -96,6 +97,6 @@ if ($_FILES['sqlFile']['error'] === UPLOAD_ERR_OK) {
         die("Erreur lors de la restauration de la base de données : " . $e->getMessage());
     }
 } else {
-    die("Erreur : Aucun fichier n'a été téléchargé.<br>");
+    die("Erreur : Aucun fichier n'a été sélectionné.<br>");
 }
 ?>

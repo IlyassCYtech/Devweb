@@ -245,9 +245,23 @@ try {
             <!-- Bouton pour restaurer la base de données -->
             <div class="glass-card rounded-2xl p-6 mb-8">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-6">Restaurer la Base de Données</h2>
-                <form action="restore_db.php" method="POST" enctype="multipart/form-data">
+                <form action="restore_db.php" method="POST">
                     <label for="sqlFile" class="block text-sm font-medium text-gray-700">Choisir un fichier .sql :</label>
-                    <input type="file" name="sqlFile" id="sqlFile" accept=".sql" class="mt-2 mb-4 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <select name="sqlFile" id="sqlFile" class="mt-2 mb-4 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <?php
+                        $backupDir = '../backups/';
+                        if (is_dir($backupDir)) {
+                            $files = array_filter(scandir($backupDir), function ($file) use ($backupDir) {
+                                return is_file($backupDir . $file) && pathinfo($file, PATHINFO_EXTENSION) === 'sql';
+                            });
+                            foreach ($files as $file) {
+                                echo "<option value=\"$file\">" . htmlspecialchars($file) . "</option>";
+                            }
+                        } else {
+                            echo "<option disabled>Aucun fichier trouvé</option>";
+                        }
+                        ?>
+                    </select>
                     <button type="submit" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
                         Restaurer la Base de Données
                     </button>
