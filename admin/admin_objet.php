@@ -116,13 +116,28 @@ $objects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        let map = L.map('map').setView([48.8566, 2.3522], 6); // Paris par défaut
+        let map = L.map('map', {
+            center: [37.7749, -122.4194], // Centre de San Francisco
+            zoom: 13,                     // Niveau de zoom initial
+            minZoom: 12,                  // Zoom minimum pour éviter de trop dézoomer
+            maxZoom: 18                   // Zoom maximum pour les détails
+        });
 
+        // Ajouter les tuiles OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        let objects = <?= json_encode($objects, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+        // Limiter la zone visible à San Francisco
+        let bounds = [
+            [37.703399, -123.017395], // Sud-Ouest (Southwest corner)
+            [37.812303, -122.348211]  // Nord-Est (Northeast corner)
+        ];
+        map.setMaxBounds(bounds); // Empêche de sortir des limites
+        map.on('drag', function () {
+            map.panInsideBounds(bounds, { animate: false }); // Empêche de glisser hors des limites
+        });
+                let objects = <?= json_encode($objects, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
         objects.forEach(obj => {
             if (obj.LocalisationGPS) {

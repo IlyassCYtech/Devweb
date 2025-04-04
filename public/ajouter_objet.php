@@ -405,23 +405,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         let marker;
 
         function initMap() {
-            map = L.map('map').setView([48.8566, 2.3522], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
+    // Initialiser la carte avec un centre et un zoom par défaut
+    map = L.map('map', {
+        center: [37.7749, -122.4194], // Centre de San Francisco
+        zoom: 13,                     // Niveau de zoom initial
+        minZoom: 12,                  // Zoom minimum
+        maxZoom: 18                   // Zoom maximum
+    });
 
-            marker = L.marker([48.8566, 2.3522], {draggable: true}).addTo(map);
-            
-            marker.on('dragend', function(e) {
-                const position = marker.getLatLng();
-                document.getElementById('localisation').value = `${position.lat},${position.lng}`;
-            });
+    // Ajouter les tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-            map.on('click', function(e) {
-                marker.setLatLng(e.latlng);
-                document.getElementById('localisation').value = `${e.latlng.lat},${e.latlng.lng}`;
-            });
-        }
+    // Définir les limites géographiques pour San Francisco
+    let bounds = [
+        [37.703399, -123.017395], // Sud-Ouest (Southwest corner)
+        [37.812303, -122.348211]  // Nord-Est (Northeast corner)
+    ];
+    map.setMaxBounds(bounds); // Empêche de sortir des limites
+    map.on('drag', function () {
+        map.panInsideBounds(bounds, { animate: false }); // Empêche de glisser hors des limites
+    });
+
+    // Ajouter un marqueur draggable au centre
+    marker = L.marker([37.7749, -122.4194], { draggable: true }).addTo(map);
+
+    // Mettre à jour les coordonnées GPS dans le champ caché lors du déplacement du marqueur
+    marker.on('dragend', function (e) {
+        const position = marker.getLatLng();
+        document.getElementById('localisation').value = `${position.lat},${position.lng}`;
+    });
+
+    // Permettre à l'utilisateur de cliquer sur la carte pour déplacer le marqueur
+    map.on('click', function (e) {
+        marker.setLatLng(e.latlng);
+        document.getElementById('localisation').value = `${e.latlng.lat},${e.latlng.lng}`;
+    });
+}
 
         window.addEventListener('load', initMap);
 

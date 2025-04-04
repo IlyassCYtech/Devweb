@@ -23,7 +23,7 @@ if (isset($_POST['objectID']) && isset($_POST['userID'])) {
         $stmt2->execute();
 
         // 3️⃣ Récupérer l'XP et le niveau actuel de l'utilisateur
-        $stmt3 = $conn->prepare("SELECT niveau, points_experience FROM users WHERE id = :userID");
+        $stmt3 = $conn->prepare("SELECT niveau, points_experience, admin FROM users WHERE id = :userID");
         $stmt3->bindParam(':userID', $userID, PDO::PARAM_INT);
         $stmt3->execute();
         $user = $stmt3->fetch(PDO::FETCH_ASSOC);
@@ -46,7 +46,7 @@ if (isset($_POST['objectID']) && isset($_POST['userID'])) {
                 $newLevel = $currentLevel;
                 $newXP = $currentXP;
             }
-            if($newLevel=='Expert'){
+            if($newLevel=='Expert' || $user['admin']==1){
                 $newAdmin=1;
             }
             else{

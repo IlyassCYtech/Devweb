@@ -151,19 +151,45 @@ $lng = isset($coordinates[1]) ? trim($coordinates[1]) : 2.3522;
         const initialLng = <?= $lng ?>;
 
         // Initialiser la carte
-        function initMap() {
-            map = L.map('map').setView([initialLat, initialLng], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
+// Initialiser la carte
+function initMap() {
+    map = L.map('map', {
+        center: [initialLat, initialLng], // Centre initial
+        zoom: 13,                        // Niveau de zoom initial
+        minZoom: 12,                     // Zoom minimum
+        maxZoom: 18                      // Zoom maximum
+    });
 
-            marker = L.marker([initialLat, initialLng], {draggable: true}).addTo(map);
-            
-            marker.on('dragend', function(e) {
-                const position = marker.getLatLng();
-                updateLocation(position.lat, position.lng);
-            });
-        }
+    // Ajouter les tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Définir les limites géographiques pour San Francisco
+    let bounds = [
+        [37.703399, -123.017395], // Sud-Ouest (Southwest corner)
+        [37.812303, -122.348211]  // Nord-Est (Northeast corner)
+    ];
+    map.setMaxBounds(bounds); // Empêche de sortir des limites
+    map.on('drag', function () {
+        map.panInsideBounds(bounds, { animate: false }); // Empêche de glisser hors des limites
+    });
+
+    // Ajouter un marqueur draggable au centre
+    marker = L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
+
+    // Mettre à jour les coordonnées GPS lors du déplacement du marqueur
+    marker.on('dragend', function (e) {
+        const position = marker.getLatLng();
+        updateLocation(position.lat, position.lng);
+    });
+
+    // Permettre à l'utilisateur de cliquer sur la carte pour déplacer le marqueur
+    map.on('click', function (e) {
+        marker.setLatLng(e.latlng);
+        updateLocation(e.latlng.lat, e.latlng.lng);
+    });
+}
 
         // Mettre à jour l'état
         function updateStatus(status) {

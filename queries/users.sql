@@ -108,30 +108,30 @@ VALUES
 
 -- Insertion d'un objet connecté avec un utilisateur spécifique
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Lampe intelligente', 'Éclairage', 'Lampe connectée avec réglage de lintensité', 'Philips', 'Actif', 'Wi-Fi', 'Électricité', 75.5, 'Allumé', '48.8566,2.3522', NULL, 95, 1); -- UtilisateurID = 1
+VALUES ('Lampe intelligente', 'Éclairage', 'Lampe connectée avec réglage de lintensité', 'Philips', 'Actif', 'Wi-Fi', 'Électricité', 75.5, 'Allumé', '37.7749,-122.4194', NULL, 95, 1); -- UtilisateurID = 1
 
 -- Insertion d'un autre objet connecté sans utilisateur (UtilisateurID = NULL)
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Caméra de sécurité', 'Surveillance', 'Caméra HD avec vision nocturne', 'Arlo', 'Actif', 'Wi-Fi', 'Batterie', NULL, NULL, '34.0522,-118.2437', NULL, 80, NULL); -- Pas d'utilisateur (UtilisateurID = NULL)
+VALUES ('Caméra de sécurité', 'Surveillance', 'Caméra HD avec vision nocturne', 'Arlo', 'Actif', 'Wi-Fi', 'Batterie', NULL, NULL, '37.7749,-122.4194', NULL, 80, NULL); -- Pas d'utilisateur (UtilisateurID = NULL)
 
 
 
 -- Insertion d'un autre objet connecté avec un autre utilisateur
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '40.7128,-74.0060', NULL, 100, 2); -- UtilisateurID = 2
+VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '37.7749,-122.4194', NULL, 100, 2); -- UtilisateurID = 2
 
 
--- Insertion de trois vélos
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie)
+-- Insertion de trois vélos à San Francisco
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS)
 VALUES 
-('Vélo Urbain 1000', 'Vélo', 'Vélo électrique pour la ville avec moteur de 250W.', 'Marque A', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 25.00, 100),
-('Vélo Sport 2000', 'Vélo', 'Vélo de sport avec transmission Shimano 21 vitesses.', 'Marque B', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 30.00, 95),
-('Vélo Cargo', 'Vélo', 'Vélo cargo pour transport de charges lourdes.', 'Marque C', 'Inactif', 'Bluetooth', 'Batterie NiMH', NOW(), 20.00, 80);
+('Vélo Urbain 1000', 'Vélo', 'Vélo électrique pour la ville avec moteur de 250W.', 'Marque A', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 25.00, 100, '37.7749,-122.4194'),
+('Vélo Sport 2000', 'Vélo', 'Vélo de sport avec transmission Shimano 21 vitesses.', 'Marque B', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 30.00, 95, '37.7749,-122.4194'),
+('Vélo Cargo', 'Vélo', 'Vélo cargo pour transport de charges lourdes.', 'Marque C', 'Inactif', 'Bluetooth', 'Batterie NiMH', NOW(), 20.00, 80, '37.7749,-122.4194');
 
--- Insertion de quatre trottinettes
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie)
+-- Insertion de quatre trottinettes à San Francisco
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS)
 VALUES
-('Trottinette Electrique X1', 'Trottinette', 'Trottinette électrique avec moteur de 250W.', 'Marque D', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 15.00, 100),
-('Trottinette Electrique X2', 'Trottinette', 'Trottinette pour trajets urbains avec système de freinage électronique.', 'Marque E', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 18.00, 85),
-('Trottinette Sport T3', 'Trottinette', 'Trottinette sport avec roues renforcées.', 'Marque F', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 20.00, 50),
-('Trottinette Connectée T4', 'Trottinette', 'Trottinette connectée avec suivi GPS et autonomie améliorée.', 'Marque G', 'Inactif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 22.00, 90);
+('Trottinette Electrique X1', 'Trottinette', 'Trottinette électrique avec moteur de 250W.', 'Marque D', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 15.00, 100, '37.7749,-122.4194'),
+('Trottinette Electrique X2', 'Trottinette', 'Trottinette pour trajets urbains avec système de freinage électronique.', 'Marque E', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 18.00, 85, '37.7749,-122.4194'),
+('Trottinette Sport T3', 'Trottinette', 'Trottinette sport avec roues renforcées.', 'Marque F', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 20.00, 50, '37.7749,-122.4194'),
+('Trottinette Connectée T4', 'Trottinette', 'Trottinette connectée avec suivi GPS et autonomie améliorée.', 'Marque G', 'Inactif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 22.00, 90, '37.7749,-122.4194');
