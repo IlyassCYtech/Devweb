@@ -340,36 +340,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div class="glass-effect shadow-lg rounded-lg p-8 max-w-3xl mx-auto relative">
-            <a href="objets.php" class="close-button absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">
-                ×
-            </a>
+    <div class="glass-effect shadow-lg rounded-lg p-8 max-w-6xl mx-auto relative">
+        <a href="objets.php" class="close-button absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">
+            ×
+        </a>
 
-            <h1 class="text-3xl font-bold text-gray-900 mb-8 relative">
-                Ajouter un Objet Connecté
-                <div class="absolute bottom-0 left-0 w-20 h-1 bg-blue-600"></div>
-            </h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-8 relative">
+            Ajouter un Objet Connecté
+            <div class="absolute bottom-0 left-0 w-20 h-1 bg-blue-600"></div>
+        </h1>
 
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-6 animate-fade-in">
-                    <?php 
-                    echo $_SESSION['success'];
-                    unset($_SESSION['success']);
-                    ?>
-                </div>
-            <?php endif; ?>
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-6 animate-fade-in">
+                <?php 
+                echo $_SESSION['success'];
+                unset($_SESSION['success']);
+                ?>
+            </div>
+        <?php endif; ?>
 
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6 animate-fade-in">
-                    <?php 
-                    echo $_SESSION['error'];
-                    unset($_SESSION['error']);
-                    ?>
-                </div>
-            <?php endif; ?>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6 animate-fade-in">
+                <?php 
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+                ?>
+            </div>
+        <?php endif; ?>
 
-            <form method="POST" class="space-y-8" onsubmit="return validateForm()">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form method="POST" class="flex flex-col md:flex-row gap-8" onsubmit="return validateForm()">
+            <!-- Left side - Form fields -->
+            <div class="w-full md:w-1/2 space-y-6">
+                <div class="grid grid-cols-1 gap-4">
                     <div class="space-y-2">
                         <label for="nom" class="block text-sm font-medium text-gray-700">Nom de l'objet</label>
                         <input type="text" name="nom" id="nom" required maxlength="100" 
@@ -389,95 +391,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
 
-                    <div class="space-y-2">
-                        <label for="marque" class="block text-sm font-medium text-gray-700">Marque</label>
-                        <input type="text" name="marque" id="marque" required maxlength="100"
-                               pattern="[a-zA-Z0-9\s\-_.,\'\"àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ]+"
-                               class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="marque" class="block text-sm font-medium text-gray-700">Marque</label>
+                            <input type="text" name="marque" id="marque" required maxlength="100"
+                                   pattern="[a-zA-Z0-9\s\-_.,\'\"àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ]+"
+                                   class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="etat" class="block text-sm font-medium text-gray-700">État</label>
+                            <select name="etat" id="etat" required
+                                    class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="Actif">Actif</option>
+                                <option value="Inactif">Inactif</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="connectivite" class="block text-sm font-medium text-gray-700">Connectivité</label>
+                            <select name="connectivite" id="connectivite" required
+                                    class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="Wi-Fi">Wi-Fi</option>
+                                <option value="Bluetooth">Bluetooth</option>
+                                <option value="Zigbee">Zigbee</option>
+                                <option value="LoRa">LoRa</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="energie" class="block text-sm font-medium text-gray-700">Énergie Utilisée</label>
+                            <select name="energie" id="energie" required
+                                    class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="Batterie Lithium">Batterie Lithium</option>
+                                <option value="Batterie Li-ion">Batterie Li-ion</option>
+                                <option value="Électricité">Électricité</option>
+                                <option value="Solaire">Solaire</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="batterie" class="block text-sm font-medium text-gray-700">État de la Batterie (%)</label>
+                            <input type="number" name="batterie" id="batterie" min="0" max="100"
+                                   class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="vitesse" class="block text-sm font-medium text-gray-700">Vitesse (km/h)</label>
+                            <input type="number" name="vitesse" id="vitesse" step="0.1" min="0" max="999.9"
+                                   class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="luminosite" class="block text-sm font-medium text-gray-700">Luminosité (%)</label>
+                            <input type="number" name="luminosite" id="luminosite" min="0" max="100"
+                                   class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="etatLuminaire" class="block text-sm font-medium text-gray-700">État Luminaire</label>
+                            <select name="etatLuminaire" id="etatLuminaire"
+                                    class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="">Non applicable</option>
+                                <option value="Allumé">Allumé</option>
+                                <option value="Éteint">Éteint</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="space-y-2">
-                        <label for="etat" class="block text-sm font-medium text-gray-700">État</label>
-                        <select name="etat" id="etat" required
-                                class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                            <option value="Actif">Actif</option>
-                            <option value="Inactif">Inactif</option>
-                        </select>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" id="description" rows="4" required maxlength="1000"
+                                  class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
+                        <p class="mt-1 text-sm text-gray-500">Caractères restants: <span id="charCount">1000</span></p>
                     </div>
-
-                    <div class="space-y-2">
-                        <label for="connectivite" class="block text-sm font-medium text-gray-700">Connectivité</label>
-                        <select name="connectivite" id="connectivite" required
-                                class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                            <option value="Wi-Fi">Wi-Fi</option>
-                            <option value="Bluetooth">Bluetooth</option>
-                            <option value="Zigbee">Zigbee</option>
-                            <option value="LoRa">LoRa</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="energie" class="block text-sm font-medium text-gray-700">Énergie Utilisée</label>
-                        <select name="energie" id="energie" required
-                                class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                            <option value="Batterie Lithium">Batterie Lithium</option>
-                            <option value="Batterie Li-ion">Batterie Li-ion</option>
-                            <option value="Électricité">Électricité</option>
-                            <option value="Solaire">Solaire</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="batterie" class="block text-sm font-medium text-gray-700">État de la Batterie (%)</label>
-                        <input type="number" name="batterie" id="batterie" min="0" max="100"
-                               class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="vitesse" class="block text-sm font-medium text-gray-700">Vitesse (km/h)</label>
-                        <input type="number" name="vitesse" id="vitesse" step="0.1" min="0" max="999.9"
-                               class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="luminosite" class="block text-sm font-medium text-gray-700">Luminosité (%)</label>
-                        <input type="number" name="luminosite" id="luminosite" min="0" max="100"
-                               class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="etatLuminaire" class="block text-sm font-medium text-gray-700">État Luminaire</label>
-                        <select name="etatLuminaire" id="etatLuminaire"
-                                class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                            <option value="">Non applicable</option>
-                            <option value="Allumé">Allumé</option>
-                            <option value="Éteint">Éteint</option>
-                        </select>
-                    </div>
-
-                    <div class="col-span-2 mb-6">
-                        <label for="map" class="block text-sm font-medium text-gray-700 mb-2">Sélectionner la localisation sur la carte</label>
-                        <div id="map" class="h-96 rounded-lg shadow-md mb-2"></div>
-                        <input type="hidden" name="localisation" id="localisation">
-                    </div>
-                </div>
-
-                <div class="col-span-2 space-y-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea name="description" id="description" rows="4" required maxlength="1000"
-                              class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500"></textarea>
-                    <p class="mt-1 text-sm text-gray-500">Caractères restants: <span id="charCount">1000</span></p>
                 </div>
 
                 <div class="flex justify-end pt-6">
                     <button type="submit"
-                            class="submit-button inline-flex justify-center py-3 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            class="submit-button inline-flex justify-center py-3 px-10 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Ajouter l'objet
                     </button>
                 </div>
-            </form>
-        </div>
-    </main>
+            </div>
+
+            <!-- Right side - Map -->
+            <div class="w-full md:w-1/2">
+                <div class="h-full flex flex-col">
+                    <label for="map" class="block text-sm font-medium text-gray-700 mb-2">Sélectionner la localisation sur la carte</label>
+                    <div id="map" class="h-full min-h-[400px] rounded-lg shadow-md flex-grow"></div>
+                    <input type="hidden" name="localisation" id="localisation">
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
     <script src="../assets/js/theme.js"></script>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
