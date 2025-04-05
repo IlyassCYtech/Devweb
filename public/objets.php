@@ -269,8 +269,9 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
                                 onclick="event.stopPropagation(); returnObject(<?= $object['ID'] ?>, <?= $user['id'] ?>)">
                             <span class="text-2xl">🔄</span>
                         </button>
-                        <h3 class="font-semibold text-xl text-gray-800 mb-3"><?= htmlspecialchars($object['Nom']) ?></h3>
+                        <h3 class="font-semibold text-xl text-gray-800 mb-3"><?= htmlspecialchars($object['Type']) ?></h3>
                         <p class="text-gray-600 mb-4"><?= htmlspecialchars($object['Description']) ?></p>
+                        <p class="text-gray-600 mb-2">Nom: <?= htmlspecialchars($object['Nom']) ?></p>
                         <div class="space-y-2">
                             <p class="text-gray-500 flex items-center">
                                 <span class="font-medium mr-2">Marque:</span> 
@@ -304,8 +305,9 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
                                 onclick="event.stopPropagation(); assignObject(<?= $object['ID'] ?>, <?= $user['id'] ?>)">
                             <span class="text-2xl">➕</span>
                         </button>
-                        <h3 class="font-semibold text-xl text-gray-800 mb-3"><?= htmlspecialchars($object['Nom']) ?></h3>
+                        <h3 class="font-semibold text-xl text-gray-800 mb-3"><?= htmlspecialchars($object['Type']) ?></h3>
                         <p class="text-gray-600 mb-4"><?= htmlspecialchars($object['Description']) ?></p>
+                        <p class="text-gray-600 mb-2">Nom: <?= htmlspecialchars($object['Nom']) ?></p>
                         <div class="space-y-2">
                             <p class="text-gray-500 flex items-center">
                                 <span class="font-medium mr-2">Marque:</span>
