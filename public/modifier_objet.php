@@ -10,16 +10,31 @@ if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
 $user_id = $_SESSION['user_id'];
 $object_id = intval($_GET['id']);
 
+
 // Récupérer les informations de l'objet
-$stmt = $conn->prepare("SELECT * FROM ObjetConnecte WHERE ID = :id AND (UtilisateurID = :user_id OR UtilisateurID IS NULL)");
-$stmt->execute([':id' => $object_id, ':user_id' => $user_id]);
+$stmt = $conn->prepare("SELECT * FROM ObjetConnecte WHERE ID = :id");
+$stmt->execute([':id' => $object_id]);
 $object = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Récupérer les informations de l'utilisateur pour vérifier s'il est admin
+$userStmt = $conn->prepare("SELECT admin FROM users WHERE id = :user_id");
+$userStmt->execute([':user_id' => $user_id]);
+$userInfo = $userStmt->fetch(PDO::FETCH_ASSOC);
+$isAdmin = $userInfo['admin'] ?? 0;
+
+// Vérifications de sécurité
 if (!$object) {
+    $_SESSION['error_message'] = "Cet objet n'existe pas.";
     header("Location: objets.php");
     exit();
 }
 
+// Vérifier si l'objet est disponible, appartient à l'utilisateur actuel, ou si l'utilisateur est admin
+if (!$isAdmin && $object['UtilisateurID'] !== null && $object['UtilisateurID'] != $user_id) {
+    $_SESSION['error_message'] = "Cet objet est actuellement utilisé par un autre utilisateur.";
+    header("Location: objets.php");
+    exit();
+}
 // Traitement de la mise à jour
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
