@@ -19,61 +19,145 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $user_id = $_SESSION['user_id'];
         
-        // Récupération des données du formulaire
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-        $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_STRING);
-        $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_STRING);
-        $date_naissance = filter_input(INPUT_POST, 'date_naissance', FILTER_SANITIZE_STRING);
-        $sexe = filter_input(INPUT_POST, 'sexe', FILTER_SANITIZE_STRING);
-        $type_membre = filter_input(INPUT_POST, 'type_membre', FILTER_SANITIZE_STRING);
+        // Définir les messages d'erreur
+        $errors = [];
 
-        // Traitement de l'upload de la photo de profil
-        if (isset($_FILES['photo_profil']) && $_FILES['photo_profil']['error'] === UPLOAD_ERR_OK) {
-            $photo = $_FILES['photo_profil'];
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (in_array($photo['type'], $allowedTypes)) {
-                $extension = pathinfo($photo['name'], PATHINFO_EXTENSION);
-                $newFileName = $user_id . '.' . $extension;
-                $uploadPath = '../uploads/' . $newFileName;
-                if(file_exists($uploadPath)){
-                    unlink($uploadPath);
-                }
-                if (move_uploaded_file($photo['tmp_name'], $uploadPath)) {
-                    // Mise à jour de la photo dans la base de données
-                    $stmt = $conn->prepare("UPDATE users SET photo_profil = :photo WHERE id = :id");
-                    $stmt->execute([
-                        ':photo' => $newFileName,
-                        ':id' => $user_id
-                    ]);
-                }
+        // Validation du nom d'utilisateur (alphanumériques et quelques caractères spéciaux)
+        $username = trim($_POST['username']);
+        if (empty($username)) {
+            $errors[] = "Le nom d'utilisateur est requis.";
+        } elseif (!preg_match('/^[a-zA-Z0-9_\-\.]{3,30}$/', $username)) {
+            $errors[] = "Le nom d'utilisateur ne doit contenir que des lettres, chiffres, tirets, points et underscores (3-30 caractères).";
+        }
+
+        // Validation du nom (alphabétique uniquement)
+        $nom = trim($_POST['nom']);
+        if (empty($nom)) {
+            $errors[] = "Le nom est requis.";
+        } elseif (!preg_match('/^[a-zA-ZÀ-ÿ\s\-]{2,50}$/', $nom)) {
+            $errors[] = "Le nom ne doit contenir que des lettres, espaces et tirets (2-50 caractères).";
+        }
+
+        // Validation du prénom (alphabétique uniquement)
+        $prenom = trim($_POST['prenom']);
+        if (empty($prenom)) {
+            $errors[] = "Le prénom est requis.";
+        } elseif (!preg_match('/^[a-zA-ZÀ-ÿ\s\-]{2,50}$/', $prenom)) {
+            $errors[] = "Le prénom ne doit contenir que des lettres, espaces et tirets (2-50 caractères).";
+        }
+
+        // Validation de la date de naissance (vérification de l'âge >= 13 ans)
+        $date_naissance = $_POST['date_naissance'];
+        if (empty($date_naissance)) {
+            $errors[] = "La date de naissance est requise.";
+        } else {
+            $birth_date = new DateTime($date_naissance);
+            $today = new DateTime();
+            $age = $today->diff($birth_date)->y;
+            
+            if ($age < 13) {
+                $errors[] = "Vous devez avoir au moins 13 ans pour utiliser ce site.";
+            } elseif ($age > 120) {
+                $errors[] = "Veuillez entrer une date de naissance valide.";
             }
         }
 
-        // Mise à jour des informations de l'utilisateur
-        $stmt = $conn->prepare("
-            UPDATE users 
-            SET username = :username,
-                nom = :nom,
-                prenom = :prenom,
-                date_naissance = :date_naissance,
-                sexe = :sexe,
-                type_membre = :type_membre
-            WHERE id = :id
-        ");
+        // Validation du sexe (limité aux options du formulaire)
+        $sexe = trim($_POST['sexe']);
+        if (!in_array($sexe, ['Homme', 'Femme', 'Autre'])) {
+            $errors[] = "Le sexe sélectionné n'est pas valide.";
+        }
 
-        $stmt->execute([
-            ':username' => $username,
-            ':nom' => $nom,
-            ':prenom' => $prenom,
-            ':date_naissance' => $date_naissance,
-            ':sexe' => $sexe,
-            ':type_membre' => $type_membre,
-            ':id' => $user_id
-        ]);
+        // Validation du type de membre (limité aux options du formulaire)
+        $type_membre = trim($_POST['type_membre']);
+        if (!in_array($type_membre, ['élève', 'parent', 'développeur', 'autre'])) {
+            $errors[] = "Le type de membre sélectionné n'est pas valide.";
+        }
 
-        // Redirection pour rafraîchir les données
-        header("Location: profil.php");
-        exit();
+        // Si aucune erreur, procéder à la mise à jour
+        if (empty($errors)) {
+            // Traitement de l'upload de la photo de profil
+            if (isset($_FILES['photo_profil']) && $_FILES['photo_profil']['error'] === UPLOAD_ERR_OK) {
+                $photo = $_FILES['photo_profil'];
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                
+                // Vérification du type MIME
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $fileType = $finfo->file($photo['tmp_name']);
+                
+                if (in_array($fileType, $allowedTypes)) {
+                    // Vérifier la taille du fichier (max 5MB)
+                    if ($photo['size'] <= 5 * 1024 * 1024) {
+                        $extension = strtolower(pathinfo($photo['name'], PATHINFO_EXTENSION));
+                        // Générer un nom de fichier sécurisé
+                        $newFileName = $user_id . '_' . uniqid() . '.' . $extension;
+                        $uploadPath = '../uploads/' . $newFileName;
+                        
+                        // Supprimer l'ancienne photo si elle existe
+                        $stmt = $conn->prepare("SELECT photo_profil FROM users WHERE id = :id");
+                        $stmt->execute([':id' => $user_id]);
+                        $old_photo = $stmt->fetchColumn();
+                        
+                        if ($old_photo && $old_photo !== 'default.jpg' && file_exists('../uploads/' . $old_photo)) {
+                            unlink('../uploads/' . $old_photo);
+                        }
+                        
+                        if (move_uploaded_file($photo['tmp_name'], $uploadPath)) {
+                            // Mise à jour de la photo dans la base de données
+                            $stmt = $conn->prepare("UPDATE users SET photo_profil = :photo WHERE id = :id");
+                            $stmt->execute([
+                                ':photo' => $newFileName,
+                                ':id' => $user_id
+                            ]);
+                        } else {
+                            $errors[] = "Erreur lors de l'upload de l'image.";
+                        }
+                    } else {
+                        $errors[] = "La taille de l'image ne doit pas dépasser 5 Mo.";
+                    }
+                } else {
+                    $errors[] = "Format d'image non autorisé. Utilisez JPG, PNG ou GIF.";
+                }
+            }
+            
+            // Si toujours aucune erreur, mise à jour des informations utilisateur
+            if (empty($errors)) {
+                // Mise à jour des informations de l'utilisateur avec prepared statement
+                $stmt = $conn->prepare("
+                    UPDATE users 
+                    SET username = :username,
+                        nom = :nom,
+                        prenom = :prenom,
+                        date_naissance = :date_naissance,
+                        sexe = :sexe,
+                        type_membre = :type_membre
+                    WHERE id = :id
+                ");
+
+                $stmt->execute([
+                    ':username' => $username,
+                    ':nom' => $nom,
+                    ':prenom' => $prenom,
+                    ':date_naissance' => $date_naissance,
+                    ':sexe' => $sexe,
+                    ':type_membre' => $type_membre,
+                    ':id' => $user_id
+                ]);
+
+                // Redirection pour rafraîchir les données
+                $_SESSION['success_message'] = "Profil mis à jour avec succès!";
+                header("Location: profil.php");
+                exit();
+            }
+        }
+        
+        // Si des erreurs existent, les stocker en session pour les afficher
+        if (!empty($errors)) {
+            $_SESSION['profile_errors'] = $errors;
+            $_SESSION['form_data'] = $_POST; // Conserver les données du formulaire
+            header("Location: profil.php");
+            exit();
+        }
     }
 
     // Récupérer l'ID de l'utilisateur depuis la session
@@ -101,6 +185,13 @@ try {
     $stmt_actions->bindParam(':id_utilisateur', $user_id, PDO::PARAM_INT);
     $stmt_actions->execute();
     $actions = $stmt_actions->fetchAll(PDO::FETCH_ASSOC);
+
+    // Ajouter l'action dans l'historique
+    $stmt = $conn->prepare("INSERT INTO Historique_Actions (id_utilisateur, type_action) VALUES (:id_utilisateur, :type_action)");
+    $stmt->execute([
+        ':id_utilisateur' => $user_id,
+        ':type_action' => 'Modification du profil'
+    ]);
 
 } catch (PDOException $e) {
     die("Erreur de base de données : " . $e->getMessage());
@@ -429,14 +520,27 @@ try {
                     <?php foreach ($actions as $action) : ?>
                         <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 ease-in-out">
                             <!-- Photo de l'objet à gauche -->
-                            <?php
-                                if ($action['objet_type'] == 'Trottinette') {
-                                    $image_src = '../assets/images/trottinette.jpg';
-                                } elseif ($action['objet_type'] == 'Vélo') {
-                                    $image_src = '../assets/images/vélo.jpg';
-                                } else {
+                        <?php
+                            if ($action['objet_type'] != null) {
+                                $basename = strtolower($action['objet_type']);
+                                $found = false;
+                                $extensions = ['jpg', 'png', 'gif'];
+                                
+                                foreach ($extensions as $ext) {
+                                    $test_path = "../assets/images/{$basename}.{$ext}";
+                                    if (file_exists($test_path)) {
+                                        $image_src = $test_path;
+                                        $found = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (!$found) {
                                     $image_src = '../assets/images/default.jpg';
                                 }
+                            } else {
+                                $image_src = '../assets/images/default.jpg';
+                            }
                             ?>
                             <img src="<?php echo htmlspecialchars($image_src); ?>" alt="Image de l'objet" class="w-16 h-16 rounded-full object-cover mr-4">
                             
@@ -464,19 +568,33 @@ try {
     </main>
 
     <script>
-        // Toggle display entre formulaire et affichage du profil
-        document.getElementById('editProfileBtn').addEventListener('click', function() {
-            document.getElementById('profileDisplay').classList.add('hidden');
-            document.getElementById('profileForm').classList.remove('hidden');
-        });
+   document.addEventListener('DOMContentLoaded', function() {
+    // Éléments du DOM pour le formulaire de profil
+    const profileDisplay = document.getElementById('profileDisplay');
+    const profileForm = document.getElementById('profileForm');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const cancelEditBtn = document.getElementById('cancelEdit');
 
-        document.getElementById('cancelEdit').addEventListener('click', function() {
-            document.getElementById('profileForm').classList.add('hidden');
-            document.getElementById('profileDisplay').classList.remove('hidden');
+    // Vérification que les éléments existent avant d'ajouter des événements
+    if (editProfileBtn && profileDisplay && profileForm) {
+        editProfileBtn.addEventListener('click', function() {
+            profileDisplay.classList.add('hidden');
+            profileForm.classList.remove('hidden');
+            editProfileBtn.classList.add('hidden');
         });
+    }
 
-        // Fonction pour définir le thème
-        function setTheme(theme) {
+    if (cancelEditBtn && profileDisplay && profileForm && editProfileBtn) {
+        cancelEditBtn.addEventListener('click', function() {
+            profileDisplay.classList.remove('hidden');
+            profileForm.classList.add('hidden');
+            editProfileBtn.classList.remove('hidden');
+        });
+    }
+
+    // Gestion du thème
+    function setTheme(theme) {
+        try {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
             
@@ -484,104 +602,202 @@ try {
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
             const lightIcon = document.getElementById('theme-toggle-light-icon');
             
-            if (theme === 'dark') {
-                darkIcon.classList.add('hidden');
-                lightIcon.classList.remove('hidden');
-            } else {
-                lightIcon.classList.add('hidden');
-                darkIcon.classList.remove('hidden');
+            if (darkIcon && lightIcon) {
+                if (theme === 'dark') {
+                    darkIcon.classList.add('hidden');
+                    lightIcon.classList.remove('hidden');
+                } else {
+                    lightIcon.classList.add('hidden');
+                    darkIcon.classList.remove('hidden');
+                }
             }
+        } catch (error) {
+            console.error("Erreur lors du changement de thème:", error);
         }
+    }
 
-        // Initialiser le thème
+    // Initialiser le thème
+    try {
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme);
+    } catch (error) {
+        console.error("Erreur lors de l'initialisation du thème:", error);
+        // Définir un thème par défaut en cas d'erreur
+        setTheme('light');
+    }
 
-        // Gestionnaire d'événements pour le bouton de basculement
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    // Gestionnaire d'événements pour le bouton de basculement
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            try {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            } catch (error) {
+                console.error("Erreur lors du basculement de thème:", error);
+            }
         });
-    </script>
-</body>
-</html>
+    }
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const profileDisplay = document.getElementById('profileDisplay');
-            const profileForm = document.getElementById('profileForm');
-            const editProfileBtn = document.getElementById('editProfileBtn');
-            const cancelEditBtn = document.getElementById('cancelEdit');
+    // Gestion des popups et des événements de clic sur les cartes
+    const niveauDiv = document.getElementById("niveauDiv");
+    const roleDiv = document.getElementById("roleDiv");
+    const xpDiv = document.getElementById("xpDiv");
 
-            editProfileBtn.addEventListener('click', function() {
-                profileDisplay.classList.add('hidden');
-                profileForm.classList.remove('hidden');
-                editProfileBtn.classList.add('hidden');
-            });
+    // Récupérer l'état admin de l'utilisateur (défini dans le PHP)
+    let userIsAdmin;
+    try {
+        // Cette valeur devrait être définie par PHP dans le HTML
+        userIsAdmin = typeof userIsAdmin !== 'undefined' ? userIsAdmin : false;
+    } catch (error) {
+        console.error("Erreur lors de la récupération du statut admin:", error);
+        userIsAdmin = false;
+    }
 
-            cancelEditBtn.addEventListener('click', function() {
-                profileDisplay.classList.remove('hidden');
-                profileForm.classList.add('hidden');
-                editProfileBtn.classList.remove('hidden');
-            });
-        });
+    function createPopup(content) {
+        try {
+            // Supprimer tout popup existant
+            let existingPopup = document.getElementById("popupOverlay");
+            if (existingPopup) existingPopup.remove();
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const niveauDiv = document.getElementById("niveauDiv");
-            const roleDiv = document.getElementById("roleDiv");
-            const xpDiv = document.getElementById("xpDiv");
+            // Créer le nouveau popup
+            let overlay = document.createElement("div");
+            overlay.id = "popupOverlay";
+            overlay.className = "fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50";
 
-            const userIsAdmin = <?php echo json_encode($user['admin']); ?>;
+            let popup = document.createElement("div");
+            popup.className = "bg-white rounded-lg shadow-xl p-6 max-w-md text-center relative";
+            popup.innerHTML = `
+                <button id="closePopup" class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm">X</button>
+                <div class="text-lg font-bold text-blue-600 mb-3">💡 Information</div>
+                <p class="text-gray-700">${content}</p>
+            `;
 
-            function createPopup(content) {
-                let existingPopup = document.getElementById("popupOverlay");
-                if (existingPopup) existingPopup.remove();
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
 
-                let overlay = document.createElement("div");
-                overlay.id = "popupOverlay";
-                overlay.className = "fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50";
-
-                let popup = document.createElement("div");
-                popup.className = "bg-white rounded-lg shadow-xl p-6 max-w-md text-center relative";
-                popup.innerHTML = `
-                    <button id="closePopup" class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm">X</button>
-                    <div class="text-lg font-bold text-blue-600 mb-3">💡 Information</div>
-                    <p class="text-gray-700">${content}</p>
-                `;
-
-                overlay.appendChild(popup);
-                document.body.appendChild(overlay);
-
-                document.getElementById("closePopup").addEventListener("click", function () {
+            // Gestionnaire pour fermer le popup
+            const closeButton = document.getElementById("closePopup");
+            if (closeButton) {
+                closeButton.addEventListener("click", function() {
                     overlay.remove();
                 });
             }
-
-            niveauDiv.addEventListener("click", function () {
-                createPopup(`
-                    🌟 <strong>Explication des niveaux</strong> 🌟<br><br>
-                    - Débutant → Intermédiaire → Avancé → <span class="text-red-600 font-bold">Expert</span> 🔥<br>
-                    - <strong>Au niveau Expert</strong>, vous pouvez demander à devenir <span class="text-green-600">Administrateur</span> et aider à gérer le site avec les créateurs !
-                `);
-            });
-
-            roleDiv.addEventListener("click", function () {
-                if (userIsAdmin) {
-                    window.location.href = "../admin/admin.php";
-                } else {
-                    createPopup(`
-                        🔒 <strong>Vos droits actuels</strong> 🔒<br><br>
-                        - Vous pouvez consulter les objets connectés.<br>
-                        - Vous pouvez gagner de l'XP et monter de niveau.<br>
-                        - <span class="text-blue-600">Au niveau Expert</span>, vous pourrez devenir Administrateur !
-                    `);
+            
+            // Fermer le popup en cliquant en dehors
+            overlay.addEventListener("click", function(e) {
+                if (e.target === overlay) {
+                    overlay.remove();
                 }
             });
+        } catch (error) {
+            console.error("Erreur lors de la création du popup:", error);
+        }
+    }
 
-            xpDiv.addEventListener("click", function () {
-                window.location.href = "objets.php";
-            });
+    // Ajouter les événements aux divs seulement s'ils existent
+    if (niveauDiv) {
+        niveauDiv.addEventListener("click", function() {
+            createPopup(`
+                🌟 <strong>Explication des niveaux</strong> 🌟<br><br>
+                - Débutant → Intermédiaire → Avancé → <span class="text-red-600 font-bold">Expert</span> 🔥<br>
+                - <strong>Au niveau Expert</strong>, vous pouvez demander à devenir <span class="text-green-600">Administrateur</span> et aider à gérer le site avec les créateurs !
+            `);
         });
+    }
+
+    if (roleDiv) {
+        roleDiv.addEventListener("click", function() {
+            if (userIsAdmin) {
+                try {
+                    window.location.href = "../admin/admin.php";
+                } catch (error) {
+                    console.error("Erreur lors de la redirection vers la page admin:", error);
+                    alert("Impossible d'accéder à la page d'administration. Veuillez réessayer.");
+                }
+            } else {
+                createPopup(`
+                    🔒 <strong>Vos droits actuels</strong> 🔒<br><br>
+                    - Vous pouvez consulter les objets connectés.<br>
+                    - Vous pouvez gagner de l'XP et monter de niveau.<br>
+                    - <span class="text-blue-600">Au niveau Expert</span>, vous pourrez devenir Administrateur !
+                `);
+            }
+        });
+    }
+
+    if (xpDiv) {
+        xpDiv.addEventListener("click", function() {
+            try {
+                window.location.href = "objets.php";
+            } catch (error) {
+                console.error("Erreur lors de la redirection vers la page objets:", error);
+                alert("Impossible d'accéder à la page des objets. Veuillez réessayer.");
+            }
+        });
+    }
+
+    // Gestion des erreurs de formulaire (s'ils existent dans la session)
+    if (document.querySelector('.alert-error')) {
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert-error');
+            alerts.forEach(alert => {
+                alert.classList.add('opacity-0');
+                setTimeout(() => {
+                    alert.remove();
+                }, 500);
+            });
+        }, 5000);
+    }
+
+    // Validation du formulaire avant soumission
+    const profileFormElement = document.querySelector('form[action="profil.php"]');
+    if (profileFormElement) {
+        profileFormElement.addEventListener('submit', function(e) {
+            let hasError = false;
+            const username = document.getElementById('username');
+            const nom = document.getElementById('nom');
+            const prenom = document.getElementById('prenom');
+            const date_naissance = document.getElementById('date_naissance');
+            
+            // Réinitialiser les messages d'erreur
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            
+            // Validation côté client
+            if (username && (!username.value || username.value.trim() === '')) {
+                showFieldError(username, "Le nom d'utilisateur est requis");
+                hasError = true;
+            }
+            
+            if (nom && (!nom.value || nom.value.trim() === '')) {
+                showFieldError(nom, "Le nom est requis");
+                hasError = true;
+            }
+            
+            if (prenom && (!prenom.value || prenom.value.trim() === '')) {
+                showFieldError(prenom, "Le prénom est requis");
+                hasError = true;
+            }
+            
+            if (date_naissance && !date_naissance.value) {
+                showFieldError(date_naissance, "La date de naissance est requise");
+                hasError = true;
+            }
+            
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    function showFieldError(field, message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+        errorDiv.textContent = message;
+        field.parentNode.appendChild(errorDiv);
+        field.classList.add('border-red-500');
+    }
+});
     </script>
 </body>
 </html>
