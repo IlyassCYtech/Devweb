@@ -51,6 +51,8 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Mes Objets | CY Tech</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="../assets/js/theme.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
@@ -315,4 +317,3 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
 </body>
 </html>
 
-<?php include('../includes/footer.php'); ?>
