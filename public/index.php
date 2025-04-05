@@ -218,7 +218,7 @@ try {
         #card {
             display: none;
             position: fixed;
-            top: 50%;
+            top: 45%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
@@ -486,7 +486,7 @@ try {
             <div class="col-md-6 d-flex align-items-center justify-content-center">
                 <div class="text-center text-white p-5">
                     <h1 class="text-4xl font-bold mb-4" style="font-family: 'Poppins', sans-serif; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);">
-                        Venez découvrir votre ville
+                        Quelle temps fait-il?
                     </h1>
                     <p class="text-lg mb-4" style="font-family: 'Poppins', sans-serif; line-height: 1.8;">
                         Observer la météo de San Francisco en direct!
@@ -505,7 +505,7 @@ try {
                     <p class="text-lg mb-4" style="font-family: 'Poppins', sans-serif; line-height: 1.8; color: #555;">
                         Venez découvrir les recoins de San Francisco grâce à ce guide vous expliquant la richesse culturelle de cette ville.
                     </p>
-                    <a href="monument.php" class="btn py-2 px-4" style="font-size: 1.2rem; font-weight: bold; background-color: #4CAF50; color: white; border: none; border-radius: 5px;">
+                    <a href="monuments/monument.php" class="btn py-2 px-4" style="font-size: 1.2rem; font-weight: bold; background-color: #4CAF50; color: white; border: none; border-radius: 5px;">
                         Aller sur la page
                     </a>
                 </div>
@@ -642,98 +642,86 @@ try {
     <div id="registerForm" class="form-section" style="display: none;">
         <h2 class="text-center mb-3 text-success">Inscription</h2>
         <form id="register-form" action="register.php" method="POST">
-            <!-- Section 1 -->
-            <div id="register-section-1" class="register-section">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label for="username" class="form-label">Pseudonyme</label>
-                        <input type="text" name="username" id="username" class="form-control border-success" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="password" class="form-label">Mot de passe</label>
-                        <input type="password" name="password" id="password-register" class="form-control border-success" required>
-                    </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="username" class="form-label">Pseudonyme</label>
+                    <input type="text" name="username" id="username" class="form-control border-success" required>
                 </div>
-                <div class="mb-4">
-                    <label for="nom" class="form-label">Nom</label>
-                    <input type="text" name="nom" id="nom" class="form-control border-success" required>
-                </div>
-                <div class="mb-4">
-                    <label for="prenom" class="form-label">Prénom</label>
-                    <input type="text" name="prenom" id="prenom" class="form-control border-success" required>
-                </div>
-                <button type="button" id="next-to-section-2" class="btn btn-primary w-100 py-2">Suivant</button>
-            </div>
-
-            <!-- Section 2 -->
-            <div id="register-section-2" class="register-section" style="display: none;">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label for="date_naissance" class="form-label">Date de naissance</label>
-                        <input type="date" name="date_naissance" id="date_naissance" class="form-control border-success" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="age" class="form-label">Âge</label>
-                        <input type="number" name="age" id="age" class="form-control border-success" required>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label for="sexe" class="form-label">Sexe/Genre</label>
-                    <select name="sexe" id="sexe" class="form-select border-success" required>
-                        <option value="Homme">Homme</option>
-                        <option value="Femme">Femme</option>
-                        <option value="Autre">Autre</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="type_membre" class="form-label">Type de membre</label>
-                    <select name="type_membre" id="type_membre" class="form-select border-success" required>
-                        <option value="élève">Élève</option>
-                        <option value="parent">Parent</option>
-                        <option value="développeur">Développeur</option>
-                        <option value="autre">Autre</option>
-                    </select>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button type="button" id="back-to-section-1" class="btn btn-secondary py-2">Précédent</button>
-                    <button type="button" id="next-to-section-3" class="btn btn-primary py-2">Suivant</button>
+                <div class="col-md-6">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" name="password" id="password-register" class="form-control border-success" required>
                 </div>
             </div>
 
-            <!-- Section 3 -->
-            <div id="register-section-3" class="register-section" style="display: none;">
-                <div class="mb-4">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" id="email-register" class="form-control border-success" required>
+            <div class="mb-3">
+                <label for="nom" class="form-label">Nom</label>
+                <input type="text" name="nom" id="nom" class="form-control border-success" required>
+            </div>
+            <div class="mb-3">
+                <label for="prenom" class="form-label">Prénom</label>
+                <input type="text" name="prenom" id="prenom" class="form-control border-success" required>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="date_naissance" class="form-label">Date de naissance</label>
+                    <input type="date" name="date_naissance" id="date_naissance" class="form-control border-success" required>
                 </div>
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label for="niveau" class="form-label">Niveau</label>
-                        <select name="niveau" id="niveau" class="form-select border-success" required>
-                            <option value="Débutant">Débutant</option>
-                            <option value="Intermédiaire">Intermédiaire</option>
-                            <option value="Avancé">Avancé</option>
-                            <option value="Expert">Expert</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="points_experience" class="form-label">Points d'expérience</label>
-                        <input type="number" name="points_experience" id="points_experience" class="form-control border-success" required>
-                    </div>
-                </div>
-                <div class="mb-4 form-check">
-                    <input type="checkbox" class="form-check-input" name="admin" id="admin" value="1">
-                    <label for="admin" class="form-check-label">Administrateur</label>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button type="button" id="back-to-section-2" class="btn btn-secondary py-2">Précédent</button>
-                    <button type="submit" class="btn btn-success py-2">S'inscrire</button>
+                <div class="col-md-6">
+                    <label for="age" class="form-label">Âge</label>
+                    <input type="number" name="age" id="age" class="form-control border-success" required>
                 </div>
             </div>
+
+            <div class="mb-3">
+                <label for="sexe" class="form-label">Sexe/Genre</label>
+                <select name="sexe" id="sexe" class="form-select border-success" required>
+                    <option value="Homme">Homme</option>
+                    <option value="Femme">Femme</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="type_membre" class="form-label">Type de membre</label>
+                <select name="type_membre" id="type_membre" class="form-select border-success" required>
+                    <option value="élève">Élève</option>
+                    <option value="parent">Parent</option>
+                    <option value="développeur">Développeur</option>
+                    <option value="autre">Autre</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" name="email" id="email-register" class="form-control border-success" required>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="niveau" class="form-label">Niveau</label>
+                    <select name="niveau" id="niveau" class="form-select border-success" required>
+                        <option value="Débutant">Débutant</option>
+                        <option value="Intermédiaire">Intermédiaire</option>
+                        <option value="Avancé">Avancé</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="points_experience" class="form-label">Points d'expérience</label>
+                    <input type="number" name="points_experience" id="points_experience" class="form-control border-success" required>
+                </div>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" name="admin" id="admin" value="1">
+                <label for="admin" class="form-check-label">Administrateur</label>
+            </div>
+            <div id="error-message-register" class="alert alert-danger" style="display: none;" role="alert"></div>
+            <button type="submit" class="btn btn-success w-100 py-2">S'inscrire</button>
         </form>
     </div>
 </div>
-
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
@@ -943,37 +931,6 @@ try {
         overlay.addEventListener("click", () => {
             overlay.style.display = "none";
             hiddenFooterContent.style.display = "none";
-        });
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const section1 = document.getElementById("register-section-1");
-        const section2 = document.getElementById("register-section-2");
-        const section3 = document.getElementById("register-section-3");
-
-        const nextToSection2 = document.getElementById("next-to-section-2");
-        const backToSection1 = document.getElementById("back-to-section-1");
-        const nextToSection3 = document.getElementById("next-to-section-3");
-        const backToSection2 = document.getElementById("back-to-section-2");
-
-        nextToSection2.addEventListener("click", () => {
-            section1.style.display = "none";
-            section2.style.display = "block";
-        });
-
-        backToSection1.addEventListener("click", () => {
-            section2.style.display = "none";
-            section1.style.display = "block";
-        });
-
-        nextToSection3.addEventListener("click", () => {
-            section2.style.display = "none";
-            section3.style.display = "block";
-        });
-
-        backToSection2.addEventListener("click", () => {
-            section3.style.display = "none";
-            section2.style.display = "block";
         });
     });
 
