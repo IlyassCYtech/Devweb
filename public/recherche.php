@@ -412,9 +412,28 @@ if (!file_exists($profilePicPath)) {
             });
     }
 
+ // Fonction optimisée pour obtenir l'URL de l'image avec la bonne extension
+const getImageUrl = async (objectType) => {
+    const basename = objectType.toLowerCase();
+    const extensions = ['.jpg', '.png', '.gif'];
+    
+    for (const ext of extensions) {
+        try {
+            const url = `../assets/images/${basename}${ext}`;
+            const response = await fetch(url, { method: 'HEAD' });
+            if (response.ok) {
+                return url;
+            }
+        } catch (e) {
+            // Continue avec l'extension suivante en cas d'erreur
+        }
+    }
+    
+    // Retourner l'image par défaut si aucune correspondance n'est trouvée
+    return '../assets/images/default.jpg';
+};
 
-
-    function searchObject() {
+function searchObject() {
     const typeObjet = document.getElementById("typeObjet").value;
     const etatObjet = document.getElementById("etatObjet").value;
     const batterieMin = document.getElementById("batterieMin").value;
@@ -424,25 +443,24 @@ if (!file_exists($profilePicPath)) {
 
     fetch(`search_object.php?type=${encodeURIComponent(typeObjet)}&etat=${encodeURIComponent(etatObjet)}&batterieMin=${encodeURIComponent(batterieMin)}&disponibilite=${encodeURIComponent(disponibiliteObjet)}`)
         .then(response => response.json())
-        .then(data => {
+        .then(async data => {
             resultsContainer.innerHTML = "";
             if (data.length === 0) {
                 resultsContainer.innerHTML = "<p class='text-gray-500'>Aucun objet trouvé.</p>";
                 return;
             }
 
-            // Création de la grille
             const gridContainer = document.createElement("div");
-            gridContainer.className = "grid grid-cols-2 gap-4"; // 2 objets par ligne
+            gridContainer.className = "grid grid-cols-2 gap-4";
 
-            data.forEach(objet => {
+            for (const objet of data) {
                 const objetCard = document.createElement("div");
                 objetCard.className = "relative flex items-center bg-white p-4 shadow rounded-lg";
 
-                // Générer l'URL de l'image en fonction du type d'objet
-                const imageUrl = `../assets/images/${objet.Type.toLowerCase()}.jpg`;
+                // Obtenir l'URL de l'image avec la bonne extension
+                const imageUrl = await getImageUrl(objet.Type);
 
-                // Calcul du temps écoulé depuis la dernière interaction
+                // Reste du code...
                 const lastInteraction = new Date(objet.DerniereInteraction);
                 const now = new Date();
                 const timeDiff = Math.floor((now - lastInteraction) / 1000);
@@ -458,11 +476,9 @@ if (!file_exists($profilePicPath)) {
                     timeText = `Il y a ${Math.floor(timeDiff / 2592000)} mois`;
                 }
 
-                // Vérifier la disponibilité de l'objet
                 const isAvailable = objet.UtilisateurID === null;
-                const idSession = <?= $user_id ?>; // Remplace par l'ID réel de l'utilisateur connecté
+                const idSession = <?= $user_id ?>;
 
-                // Ajout des boutons d'action avec emojis en haut à droite
                 let actionButton = "";
                 if (isAvailable) {
                     actionButton = `<button data-object-id="${objet.ID}" class="absolute top-2 right-2 text-green-500 text-2xl" onclick="addObject(${objet.ID})">➕</button>`;
@@ -483,7 +499,7 @@ if (!file_exists($profilePicPath)) {
                     </div>
                 `;
                 gridContainer.appendChild(objetCard);
-            });
+            }
 
             resultsContainer.appendChild(gridContainer);
         })
@@ -491,7 +507,6 @@ if (!file_exists($profilePicPath)) {
             resultsContainer.innerHTML = "<p class='text-red-500'>❌ Erreur lors de la recherche.</p>";
         });
 }
-
 // Fonctions pour ajouter ou retirer un objet
 
 
