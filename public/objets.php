@@ -154,6 +154,11 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
             color: #fbbf24;
         }
 
+        .theme-toggle svg {
+            width: 20px; /* Ensure consistent size */
+            height: 20px;
+        }
+
         .theme-toggle:hover {
             background-color: #e5e7eb;
         }
@@ -197,6 +202,16 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
         [data-theme="dark"] .bg-white {
             background-color: var(--card-bg);
         }
+
+
+        [data-theme="dark"] .theme-toggle {
+            background-color: #374151;
+            color: #fbbf24;
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background-color: #4b5563;
+}
     </style>
 </head>
 <body class="min-h-screen">
@@ -219,7 +234,7 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="recherche.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">🔍</a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button id="theme-toggle" class="theme-toggle">
+                <button id="theme-toggle" class="theme-toggle">
                         <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
                         </svg>
@@ -314,6 +329,40 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
     </main>
 
     <script src="../assets/js/objet.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.style.display = 'block'; // Assurez-vous qu'il est visible
+    }
+});
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const themeToggle = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            
+            // Get saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            // Show correct icon on page load
+            if (savedTheme === 'dark') {
+                darkIcon.classList.add('hidden');
+                lightIcon.classList.remove('hidden');
+            } else {
+                lightIcon.classList.add('hidden');
+                darkIcon.classList.remove('hidden');
+            }
+
+            if (themeToggle) {
+                themeToggle.style.display = 'block';
+            }
+        });
+  
+
+</script>
+
 </body>
 </html>
 
