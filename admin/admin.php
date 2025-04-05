@@ -52,6 +52,37 @@ try {
     log_error("Erreur lors de la récupération des données: " . $e->getMessage());
     die("Erreur interne, veuillez réessayer plus tard.");
 }
+
+
+// Fonction pour récupérer l'historique d'un utilisateur (pour AJAX)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'get_history') {
+    try {
+        $userId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+        
+        if ($userId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID utilisateur invalide']);
+            exit;
+        }
+        
+        // Récupérer l'historique des actions de l'utilisateur
+        $stmtHistory = $pdo->prepare("
+        SELECT h.*, o.Nom as nom_objet 
+        FROM Historique_Actions h 
+        LEFT JOIN ObjetConnecte o ON h.id_objet_connecte = o.ID 
+        WHERE h.id_utilisateur = :user_id 
+        ORDER BY h.date_heure DESC
+    ");
+    $stmtHistory->execute([':user_id' => $userId]);
+        $history = $stmtHistory->fetchAll(PDO::FETCH_ASSOC);
+        
+        echo json_encode(['success' => true, 'history' => $history]);
+        exit;
+    } catch (PDOException $e) {
+        log_error("Erreur lors de la récupération de l'historique: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Erreur lors de la récupération des données']);
+        exit;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -104,6 +135,49 @@ try {
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Style pour le modal d'historique */
+        .history-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .history-modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 70%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: fadeInModal 0.3s ease;
+        }
+        
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close-modal:hover {
+            color: #555;
         }
     </style>
 </head>
@@ -189,6 +263,9 @@ try {
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button class="btn-hover btn-history mr-2 inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" data-id="<?= $user['id'] ?>" data-username="<?= htmlspecialchars($user['username']) ?>">
+                                            Historique
+                                        </button>
                                         <button class="btn-hover btn-edit mr-2 inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-id="<?= $user['id'] ?>">
                                             Modifier
                                         </button>
@@ -310,7 +387,25 @@ try {
             </div>
         </div>
     </div>
-                            </main>
+</main>
+
+    <!-- Modal pour afficher l'historique des actions -->
+    <div id="historyModal" class="history-modal">
+        <div class="history-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="historyTitle" class="text-2xl font-bold mb-4 text-gray-900"></h2>
+            <div id="historyContent" class="mt-4">
+                <div class="flex justify-center">
+                    <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <p class="text-center text-gray-600 mt-2">Chargement de l'historique...</p>
+            </div>
+        </div>
+    </div>
+
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -468,5 +563,101 @@ try {
         });
     });
     </script>
+      <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Référence au modal
+    const historyModal = document.getElementById("historyModal");
+    const closeBtn = document.querySelector(".close-modal");
+    
+    // Fonction pour fermer le modal
+    function closeModal() {
+        historyModal.style.display = "none";
+    }
+    
+    // Fermer le modal en cliquant sur le X
+    closeBtn.addEventListener("click", closeModal);
+    
+    // Fermer le modal en cliquant en dehors du contenu
+    window.addEventListener("click", function(event) {
+        if (event.target === historyModal) {
+            closeModal();
+        }
+    });
+    
+    // Afficher l'historique d'un utilisateur
+    document.querySelectorAll(".btn-history").forEach(button => {
+        button.addEventListener("click", function() {
+            const userId = this.dataset.id;
+            const username = this.dataset.username;
+            
+            // Afficher le modal
+            historyModal.style.display = "block";
+            document.getElementById("historyTitle").textContent = `Historique des actions de ${username}`;
+            
+            // Indiquer le chargement
+            const historyContent = document.getElementById("historyContent");
+            historyContent.innerHTML = `
+                <div class="flex justify-center">
+                    <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <p class="text-center text-gray-600 mt-2">Chargement de l'historique...</p>
+            `;
+            
+            // Charger l'historique via AJAX
+            fetch("admin.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `action=get_history&id=${userId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.history && data.history.length > 0) {
+                    // Créer un tableau pour afficher l'historique
+                    let tableHTML = `
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type d'action</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Objet concerné</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                    `;
+                    
+                    data.history.forEach(item => {
+                        tableHTML += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.date_heure}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.type_action}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.nom_objet || 'Aucun objet'}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableHTML += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    historyContent.innerHTML = tableHTML;
+                } else {
+                    historyContent.innerHTML = `<p class="text-center text-gray-600">Aucun historique disponible pour cet utilisateur.</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Erreur:", error);
+                historyContent.innerHTML = `<p class="text-center text-red-600">Erreur lors du chargement de l'historique. Consultez la console pour plus de détails.</p>`;
+            });
+        });
+    });
+});
+</script>
+
 </body>
 </html>
