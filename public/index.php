@@ -126,6 +126,68 @@ try {
             background-position: center;
         }
 
+        #section-1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        #section-1 h1 {
+            margin-top: -155px; /* Positionne le titre plus haut */
+            font-size: 4rem; /* Taille du titre pour un effet PowerPoint */
+            font-weight: bold;
+        }
+
+        #section-1 h2 {
+            margin-top: 20px;
+            font-size: 1.8rem; /* Taille du sous-titre */
+            font-weight: 500;
+        }
+
+        #section-1 .grid {
+            margin-top: 150px; /* Espacement entre le titre et les cartes */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Grille responsive */
+            gap: 30px; /* Espacement entre les cartes */
+            width: 100%;
+            max-width: 1200px; /* Limite la largeur totale */
+        }
+
+        #section-1 .stat-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7); /* Fond noir transparent */
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        #section-1 .stat-card:hover {
+            transform: scale(1.05); /* Zoom léger au survol */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        #section-1 .stat-card i {
+            font-size: 3rem; /* Icône plus grande */
+            margin-bottom: 15px;
+        }
+
+        #section-1 .stat-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        #section-1 .stat-card p {
+            font-size: 1.2rem;
+        }
+
         #section-2 .col-md-6:first-child {
             background: rgba(0, 0, 0, 0.6);
         }
@@ -259,147 +321,14 @@ try {
         .arrow i {
             font-size: 2rem;
         }
-
-        .navigation-dots {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .navigation-dots .dot {
-            width: 12px;
-            height: 12px;
-            background-color: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .navigation-dots .dot.active {
-            background-color: rgba(255, 255, 255, 1);
-            transform: scale(1.2);
-        }
-
-        .navigation-dots .dot:hover {
-            background-color: rgba(255, 255, 255, 0.8);
-        }
-
-        #section-1 {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 50px 20px;
-        }
-
-        #section-1 h1 {
-            margin-top: -155px; /* Positionne le titre plus haut */
-            font-size: 4rem; /* Taille du titre pour un effet PowerPoint */
-            font-weight: bold;
-        }
-
-        #section-1 h2 {
-            margin-top: 20px;
-            font-size: 1.8rem; /* Taille du sous-titre */
-            font-weight: 500;
-        }
-
-        #section-1 .grid {
-            margin-top: 150px; /* Espacement entre le titre et les cartes */
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Grille responsive */
-            gap: 30px; /* Espacement entre les cartes */
-            width: 100%;
-            max-width: 1200px; /* Limite la largeur totale */
-        }
-
-        #section-1 .stat-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7); /* Fond noir transparent */
-            color: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        #section-1 .stat-card:hover {
-            transform: scale(1.05); /* Zoom léger au survol */
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        #section-1 .stat-card i {
-            font-size: 3rem; /* Icône plus grande */
-            margin-bottom: 15px;
-        }
-
-        #section-1 .stat-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        #section-1 .stat-card p {
-            font-size: 1.2rem;
-        }
     </style>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const sections = document.querySelectorAll(".section");
-            const navigationDots = document.createElement("div");
-            navigationDots.classList.add("navigation-dots");
-
-            // Création des points de navigation
-            sections.forEach((section, index) => {
-                const dot = document.createElement("div");
-                dot.classList.add("dot");
-                if (index === 0) dot.classList.add("active");
-
-                dot.addEventListener("click", () => {
-                    sections[index].scrollIntoView({ behavior: "smooth" });
-                    updateActiveDot(index);
-                });
-
-                navigationDots.appendChild(dot);
-            });
-
-            document.body.appendChild(navigationDots);
-
-            // Fonction pour mettre à jour le point actif
-            function updateActiveDot(activeIndex) {
-                const dots = document.querySelectorAll(".navigation-dots .dot");
-                dots.forEach((dot, index) => {
-                    if (index === activeIndex) {
-                        dot.classList.add("active");
-                    } else {
-                        dot.classList.remove("active");
-                    }
-                });
-            }
-
-            // Détection de la section visible lors du défilement
-            function detectActiveSection() {
-                let currentSectionIndex = 0;
-                sections.forEach((section, index) => {
-                    const rect = section.getBoundingClientRect();
-                    if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
-                        currentSectionIndex = index;
-                    }
-                });
-                updateActiveDot(currentSectionIndex);
-            }
-
-            // Gestion des flèches directionnelles
             const arrowLeft = document.getElementById("arrow-left");
             const arrowRight = document.getElementById("arrow-right");
             let currentSectionIndex = 0;
+            let isScrolling = false; // Verrouillage pour empêcher les défilements multiples
 
             function scrollToSection(index) {
                 if (index < 0) {
@@ -407,30 +336,56 @@ try {
                 } else if (index >= sections.length) {
                     index = 0; // Retourner à la première section
                 }
-                sections[index].scrollIntoView({ behavior: "smooth" });
+                sections[index].scrollIntoView({ behavior: "smooth", inline: "start" });
                 currentSectionIndex = index;
-                updateActiveDot(index);
             }
 
             arrowLeft.addEventListener("click", () => {
-                scrollToSection(currentSectionIndex - 1);
+                if (!isScrolling) {
+                    isScrolling = true;
+                    scrollToSection(currentSectionIndex - 1);
+                    setTimeout(() => isScrolling = false, 800); // Délai pour éviter les défilements multiples
+                }
             });
 
             arrowRight.addEventListener("click", () => {
-                scrollToSection(currentSectionIndex + 1);
+                if (!isScrolling) {
+                    isScrolling = true;
+                    scrollToSection(currentSectionIndex + 1);
+                    setTimeout(() => isScrolling = false, 800); // Délai pour éviter les défilements multiples
+                }
             });
 
             // Gestion du défilement vertical pour naviguer horizontalement
             window.addEventListener("wheel", (event) => {
+                if (isScrolling) return; // Empêche les défilements multiples rapides
+                isScrolling = true;
+
                 if (event.deltaY > 0) {
+                    // Scroll vers le bas
                     scrollToSection(currentSectionIndex + 1);
                 } else if (event.deltaY < 0) {
+                    // Scroll vers le haut
                     scrollToSection(currentSectionIndex - 1);
                 }
+
+                setTimeout(() => {
+                    isScrolling = false; // Réinitialise le verrouillage après un court délai
+                }, 800); // Délai pour éviter les défilements rapides
             });
 
-            // Mise à jour des points lors du défilement manuel
-            window.addEventListener("scroll", detectActiveSection);
+            // Navbar links scroll behavior
+            const navLinks = document.querySelectorAll(".glass-nav a");
+            navLinks.forEach(link => {
+                link.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute("href").substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: "smooth", inline: "start" });
+                    }
+                });
+            });
         });
     </script>
 </head>
@@ -468,31 +423,57 @@ try {
 
 <!-- Section principale -->
 <div id="section-1" class="section section-1" style="background-image: url('../assets/images/background.png');">
-    <h1>Bienvenue sur le site de San Francisco!</h1>
-    <h2>Découvrez votre ville sous différents angles grâce à notre large base de données!</h2>
-    <div class="grid">
-        <!-- Carte: Nombre d'utilisateurs -->
-        <div class="stat-card">
-            <i class="fas fa-users"></i>
-            <h3>Nombre d'Utilisateurs</h3>
-            <p><?php echo number_format($total_users, 0, ',', ' '); ?></p>
-            <p>Utilisateurs enregistrés</p>
+    <div class="container-fluid min-vh-100 d-flex flex-column align-items-center justify-content-center">
+        <div class="text-center mb-4">
+            <h1 class="text-6xl font-bold text-white mb-4" style="margin-top: -215px; font-family: 'Roboto Slab', serif; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);">
+                Bienvenue sur le site de San Francisco!
+            </h1>
+            <h2 class="text-2xl font-bold text-white mb-4" style="font-family: 'Roboto Slab', serif; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+                Découvrez votre ville sous différents angles!
+            </h2> 
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+            <!-- Carte: Nombre d'utilisateurs -->
+            <div class="stat-card p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-center">
+                    <div class="bg-gray-200 text-black-600 p-4 rounded-full">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">Nombre d'Utilisateurs</h3>
+                        <p class="text-4xl font-bold text-gray-900"><?php echo number_format($total_users, 0, ',', ' '); ?></p>
+                        <p class="text-sm text-gray-500 mt-1">Utilisateurs enregistrés</p>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Carte: Total des objets -->
-        <div class="stat-card">
-            <i class="fas fa-database"></i>
-            <h3>Total des Objets</h3>
-            <p><?php echo number_format($total_objets, 0, ',', ' '); ?></p>
-            <p>Objets dans la base de données</p>
-        </div>
+            <!-- Carte: Total des objets -->
+            <div class="stat-card p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 text-blue-600 p-4 rounded-full">
+                        <i class="fas fa-database text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">Total des Objets</h3>
+                        <p class="text-4xl font-bold text-blue-600"><?php echo number_format($total_objets, 0, ',', ' '); ?></p>
+                        <p class="text-sm text-gray-500 mt-1">Objets dans la base de données</p>
+                    </div>
+                </div>
+            </div>
 
-        <!-- Carte: Objets disponibles -->
-        <div class="stat-card">
-            <i class="fas fa-check-circle"></i>
-            <h3>Objets Disponibles</h3>
-            <p><?php echo number_format($objets_disponibles, 0, ',', ' '); ?></p>
-            <p>Objets actuellement disponibles</p>
+            <!-- Carte: Objets disponibles -->
+            <div class="stat-card p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-center">
+                    <div class="bg-green-100 text-green-600 p-4 rounded-full">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">Objets Disponibles</h3>
+                        <p class="text-4xl font-bold text-green-600"><?php echo number_format($objets_disponibles, 0, ',', ' '); ?></p>
+                        <p class="text-sm text-gray-500 mt-1">Objets actuellement disponibles</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -765,6 +746,15 @@ try {
         const closeCardButton = document.getElementById('closeCard');
         const card = document.getElementById('card');
         const overlay = document.getElementById('overlay');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        // Afficher le formulaire de connexion
+        showLoginButton.addEventListener('click', () => {
+            overlay.style.display = 'block';
+            card.style.display = 'block';
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
         });
 
         // Afficher le formulaire d'inscription
