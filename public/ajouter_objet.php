@@ -339,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
     <div class="glass-effect shadow-lg rounded-lg p-8 max-w-6xl mx-auto relative">
         <a href="objets.php" class="close-button absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">
             ×
@@ -475,7 +475,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="flex justify-end pt-6">
                     <button type="submit"
-                            class="submit-button inline-flex justify-center py-3 px-10 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            class="submit-button inline-flex justify-center py-3 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Ajouter l'objet
                     </button>
                 </div>
