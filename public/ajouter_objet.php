@@ -149,8 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="fr" class="light">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -158,50 +157,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .input-transition {
-            transition: all 0.3s ease;
+        /* Mode clair */
+        :root {
+            --bg-primary: #f9fafb;
+            --text-primary: #111827;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
         }
 
-        .input-transition:focus {
-            transform: translateY(-2px);
-        }
-
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .hover-scale {
-            transition: transform 0.2s ease;
-        }
-
-        .hover-scale:hover {
-            transform: scale(1.02);
+        /* Mode sombre */
+        [data-theme="dark"] {
+            --bg-primary: #111827;
+            --text-primary: #f9fafb;
+            --card-bg: #1f2937;
+            --card-border: #374151;
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
         }
 
-        .form-card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            transition: all 0.3s ease;
         }
 
-        .form-card:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+        [data-theme="dark"] .glass-nav {
+            background: rgba(17, 24, 39, 0.8);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+        }
+
+        .glass-effect {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        /* Dark mode toggle button */
+        .theme-toggle {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background-color: #374151;
+            color: #fbbf24;
+        }
+
+        .theme-toggle:hover {
+            background-color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background-color: #4b5563;
+        }
+
+        [data-theme="dark"] .text-gray-600 {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .text-gray-700 {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .text-gray-900 {
+            color: #f9fafb;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: var(--card-bg);
+        }
+
+        [data-theme="dark"] .bg-gray-200 {
+            background-color: #374151;
+        }
+
+        [data-theme="dark"] .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+
+        [data-theme="dark"] .border-gray-300 {
+            border-color: #4b5563;
+        }
+
+        [data-theme="dark"] .focus\:ring-blue-500:focus {
+            --tw-ring-opacity: 1;
+            --tw-ring-color: rgba(59, 130, 246, var(--tw-ring-opacity));
+        }
+
+        [data-theme="dark"] .focus\:border-blue-500:focus {
+            --tw-border-opacity: 1;
+            border-color: rgba(59, 130, 246, var(--tw-border-opacity));
+        }
+
+        [data-theme="dark"] input, 
+        [data-theme="dark"] select, 
+        [data-theme="dark"] textarea {
+            background-color: #374151;
+            color: #f9fafb;
         }
 
         .input-field {
@@ -231,9 +297,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .close-button:hover {
             transform: rotate(90deg);
         }
+
+        #map { height: 400px; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
+    <!-- Navbar avec bouton de thème -->
     <nav class="glass-nav fixed w-full z-50 top-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -247,20 +316,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="profil.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Profil</a>
                     <a href="dashboard.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Accueil</a>
                     <a href="objets.php" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
-                    <?php if ($user['admin']) : ?>
+                    <?php if (isset($user) && $user['admin']) : ?>
                         <a href="../admin/admin.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Admin</a>
                     <?php endif; ?>
                     <a href="recherche.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">🔍</a>
                 </div>
-                <a href="logout.php" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 transition-opacity duration-200">
-                    Déconnexion
-                </a>
+
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="theme-toggle">
+                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+                        </svg>
+                    </button>
+                    <a href="logout.php" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                        Déconnexion
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div class="form-card bg-white shadow-lg rounded-lg p-8 max-w-3xl mx-auto relative glass-effect">
+        <div class="glass-effect shadow-lg rounded-lg p-8 max-w-3xl mx-auto relative">
             <a href="objets.php" class="close-button absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">
                 ×
             </a>
@@ -301,11 +381,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
                         <select name="type" id="type" required
                                 class="input-field mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500">
-                            <?php foreach ($types as $type): ?>
+                            <?php if (isset($types)): foreach ($types as $type): ?>
                                 <option value="<?= htmlspecialchars($type['Nom']) ?>">
                                     <?= htmlspecialchars($type['Nom']) ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <?php endforeach; endif; ?>
                         </select>
                     </div>
 
@@ -398,6 +478,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </main>
+    <script src="../assets/js/theme.js"></script>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>

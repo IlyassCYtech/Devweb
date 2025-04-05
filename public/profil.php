@@ -108,7 +108,7 @@ try {
 ?>
 
 <!DOCTYPE html>
-<html lang="fr" class="light">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -119,20 +119,48 @@ try {
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Mode clair */
+        :root {
+            --bg-primary: #f9fafb;
+            --text-primary: #111827;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+        }
+
+        /* Mode sombre */
+        [data-theme="dark"] {
+            --bg-primary: #111827;
+            --text-primary: #f9fafb;
+            --card-bg: #1f2937;
+            --card-border: #374151;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
         }
 
         .glass-nav {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .glass-nav {
+            background: rgba(17, 24, 39, 0.8);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
         }
 
         .stat-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 1rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s;
+            transition: transform 0.2s, background-color 0.3s;
+            border: 1px solid var(--card-border);
         }
 
         .stat-card:hover {
@@ -144,11 +172,53 @@ try {
             border-radius: 9999px;
             height: 0.5rem;
         }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background-color: #374151;
+            color: #fbbf24;
+        }
+
+        .theme-toggle:hover {
+            background-color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background-color: #4b5563;
+        }
+
+        /* Dark mode text adjustments */
+        [data-theme="dark"] .text-gray-500 { color: #9ca3af; }
+        [data-theme="dark"] .text-gray-600 { color: #d1d5db; }
+        [data-theme="dark"] .text-gray-700 { color: #e5e7eb; }
+        [data-theme="dark"] .text-gray-900 { color: #f9fafb; }
+        [data-theme="dark"] .bg-gray-50 { background-color: #374151; }
+        [data-theme="dark"] .bg-white { background-color: var(--card-bg); }
+        [data-theme="dark"] .border-gray-200 { border-color: #374151; }
+        [data-theme="dark"] .border-gray-300 { border-color: #4b5563; }
+        
+        /* Form input style adjustments for dark mode */
+        [data-theme="dark"] input, [data-theme="dark"] select {
+            background-color: #1f2937;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+        
+        [data-theme="dark"] input:focus, [data-theme="dark"] select:focus {
+            border-color: #3b82f6;
+            ring-color: #3b82f6;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gray-50">
+<body>
     <!-- Navbar -->
-   <!-- Navbar -->
     <nav class="glass-nav fixed w-full z-50 top-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -184,7 +254,6 @@ try {
             </div>
         </div>
     </nav>
-
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
@@ -393,6 +462,49 @@ try {
             <?php endif; ?>
         </div>
     </main>
+
+    <script>
+        // Toggle display entre formulaire et affichage du profil
+        document.getElementById('editProfileBtn').addEventListener('click', function() {
+            document.getElementById('profileDisplay').classList.add('hidden');
+            document.getElementById('profileForm').classList.remove('hidden');
+        });
+
+        document.getElementById('cancelEdit').addEventListener('click', function() {
+            document.getElementById('profileForm').classList.add('hidden');
+            document.getElementById('profileDisplay').classList.remove('hidden');
+        });
+
+        // Fonction pour définir le thème
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            // Mettre à jour les icônes
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            
+            if (theme === 'dark') {
+                darkIcon.classList.add('hidden');
+                lightIcon.classList.remove('hidden');
+            } else {
+                lightIcon.classList.add('hidden');
+                darkIcon.classList.remove('hidden');
+            }
+        }
+
+        // Initialiser le thème
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
+        // Gestionnaire d'événements pour le bouton de basculement
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+    </script>
+</body>
+</html>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

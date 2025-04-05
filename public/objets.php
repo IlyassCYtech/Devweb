@@ -44,7 +44,7 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
-<html lang="fr" class="light">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -52,10 +52,51 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.9);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Mode clair */
+        :root {
+            --bg-primary: #f9fafb;
+            --text-primary: #111827;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+        }
+
+        /* Mode sombre */
+        [data-theme="dark"] {
+            --bg-primary: #111827;
+            --text-primary: #f9fafb;
+            --card-bg: #1f2937;
+            --card-border: #374151;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] .glass-nav {
+            background: rgba(17, 24, 39, 0.8);
+            border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+        }
+
+        .glass-effect {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
         }
         
         .card-hover {
@@ -90,16 +131,74 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
         .object-card {
             cursor: pointer;
             transition: all 0.3s ease;
+            background-color: var(--card-bg);
         }
         
         .object-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
+        /* Dark mode toggle button */
+        .theme-toggle {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background-color: #374151;
+            color: #fbbf24;
+        }
+
+        .theme-toggle:hover {
+            background-color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .theme-toggle:hover {
+            background-color: #4b5563;
+        }
+
+        [data-theme="dark"] .nav-link {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .nav-link:hover {
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .text-gray-500 {
+            color: #9ca3af;
+        }
+
+        [data-theme="dark"] .text-gray-600 {
+            color: #d1d5db;
+        }
+
+        [data-theme="dark"] .text-gray-700 {
+            color: #e5e7eb;
+        }
+
+        [data-theme="dark"] .text-gray-800 {
+            color: #f3f4f6;
+        }
+
+        [data-theme="dark"] .text-gray-900 {
+            color: #f9fafb;
+        }
+
+        [data-theme="dark"] .bg-gray-50 {
+            background-color: #1f2937;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: var(--card-bg);
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <nav class="glass-nav fixed w-full z-50 top-0 glass-effect">
+<body class="min-h-screen">
+    <nav class="glass-nav fixed w-full z-50 top-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex">
@@ -109,17 +208,27 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
 
                 <div class="hidden sm:flex sm:items-center sm:justify-center flex-grow space-x-8">
-                    <a href="profil.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Profil</a>
-                    <a href="dashboard.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Accueil</a>
-                    <a href="objets.php" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
+                    <a href="profil.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Profil</a>
+                    <a href="dashboard.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Accueil</a>
+                    <a href="objets.php" class="nav-link text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
                     <?php if ($user['admin']) : ?>
                         <a href="../admin/admin.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Admin</a>
                     <?php endif; ?>
-                    <a href="recherche.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">🔍</a>
+                    <a href="recherche.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">🔍</a>
                 </div>
-                <a href="logout.php" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
-                    Déconnexion
-                </a>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="theme-toggle">
+                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+                        </svg>
+                    </button>
+                    <a href="logout.php" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
+                        Déconnexion
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
@@ -168,6 +277,7 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- Section Objets Disponibles -->
         <div>
+            
             <h2 class="text-2xl font-semibold text-gray-800 section-header">Objets Disponibles</h2>
             <div id="availableObjects" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 <?php while ($object = $availableStmt->fetch(PDO::FETCH_ASSOC)) : ?>
@@ -204,3 +314,5 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="../assets/js/objet.js"></script>
 </body>
 </html>
+
+<?php include('../includes/footer.php'); ?>
