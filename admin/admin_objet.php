@@ -137,52 +137,65 @@ $objects = $stmt->fetchAll(PDO::FETCH_ASSOC);
         map.on('drag', function () {
             map.panInsideBounds(bounds, { animate: false }); // Empêche de glisser hors des limites
         });
-                let objects = <?= json_encode($objects, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 
-        objects.forEach(obj => {
+        // Fonction pour vérifier si une image existe
+        async function checkImageExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        let objects = <?= json_encode($objects, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+        objects.forEach(async obj => {
             if (obj.LocalisationGPS) {
                 let coords = obj.LocalisationGPS.split(',');
                 let lat = parseFloat(coords[0]);
                 let lng = parseFloat(coords[1]);
 
-                let iconUrl = `/assets/images/${obj.Type.toLowerCase()}.jpg`;
-                let fallbackIcon = `/assets/images/default.jpg`;
+                // Définir les extensions possibles
+                const extensions = ['.jpg', '.jpeg', '.png', '.gif'];
+                let iconUrl = '/assets/images/default.jpg'; // Image par défaut
 
-                // Vérifier si l'image existe avant de l'utiliser
-                fetch(iconUrl, { method: 'HEAD' })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Image not found');
-                        return iconUrl;
-                    })
-                    .catch(() => fallbackIcon) // Si erreur, utiliser l'image par défaut
-                    .then(finalIconUrl => {
-                        // Créer un "divIcon" personnalisé avec une flèche vers le bas et l'image à l'intérieur
-                        let customIcon = L.divIcon({
-                            className: 'custom-icon', // Classe CSS pour l'icône personnalisée
-                            html: `
-                                <div class="relative">
-                                    <div class="pin-container">
-                                        <img src="${finalIconUrl}" class="rounded-full pin-image" />
-                                        <div class="pin-arrow"></div>
-                                    </div>
-                                </div>
-                            `,
-                            iconSize: [50, 60], // Ajuster la taille de l'icône pour inclure la flèche
-                            iconAnchor: [25, 60], // Ancrage au bas de l'icône pour aligner la flèche
-                            popupAnchor: [0, -60] // Pour positionner la popup au-dessus de l'icône
-                        });
+                // Vérifier chaque extension possible
+                const baseUrl = `/assets/images/${obj.Type.toLowerCase()}`;
+                for (const ext of extensions) {
+                    const url = baseUrl + ext;
+                    if (await checkImageExists(url)) {
+                        iconUrl = url;
+                        break;
+                    }
+                }
 
-                        let marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
-
-                        marker.bindPopup(`
-                            <div class="text-sm">
-                                <h3 class="font-bold text-lg">${obj.Nom}</h3>
-                                <p><strong>Type:</strong> ${obj.Type}</p>
-                                <p><strong>État:</strong> <span class="${obj.Etat === 'Actif' ? 'text-green-500' : 'text-red-500'}">${obj.Etat}</span></p>
-                                <a href="../public/modifier_objet.php?id=${obj.ID}" class="text-blue-500 underline">Modifier</a>
+                // Créer le marqueur avec l'image trouvée
+                let customIcon = L.divIcon({
+                    className: 'custom-icon',
+                    html: `
+                        <div class="relative">
+                            <div class="pin-container">
+                                <img src="${iconUrl}" class="rounded-full pin-image" />
+                                <div class="pin-arrow"></div>
                             </div>
-                        `);
-                    });
+                        </div>
+                    `,
+                    iconSize: [50, 60],
+                    iconAnchor: [25, 60],
+                    popupAnchor: [0, -60]
+                });
+
+                let marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+
+                marker.bindPopup(`
+                    <div class="text-sm">
+                        <h3 class="font-bold text-lg">${obj.Nom}</h3>
+                        <p><strong>Type:</strong> ${obj.Type}</p>
+                        <p><strong>État:</strong> <span class="${obj.Etat === 'Actif' ? 'text-green-500' : 'text-red-500'}">${obj.Etat}</span></p>
+                        <a href="../public/modifier_objet.php?id=${obj.ID}" class="text-blue-500 underline">Modifier</a>
+                    </div>
+                `);
             }
         });
     </script>
