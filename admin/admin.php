@@ -20,7 +20,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 if ($_SESSION['is_confirmed'] != 1 || $_SESSION['is_confirmed_by_ad'] != 1) {
-    header("Location: index.php");
+    header("Location: ../public/index.php");
     exit();
 }
 $user_id = $_SESSION['user_id'];
@@ -230,7 +230,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <a href="../public/objets.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
                     <?php if ($user['admin']) : ?>
                         <a href="../admin/admin.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium">Admin</a>
-                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php if ($user['admin']) : ?>
+                        <a href="../admin/rapport.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium">Rapport</a>
+                    <?php endif; ?>
                     <a href="../public/recherche.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">🔍</a>
                 </div>
                 <a href="../public/logout.php" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
@@ -262,51 +265,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <h2 class="text-2xl font-semibold text-gray-900 mb-6">Liste des Utilisateurs</h2>
                 <div class="table-container bg-white">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom d'utilisateur</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Niveau</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">XP</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        
+                    <!-- filepath: /home/cytech/Devweb-main/Devweb-main/admin/admin.php -->
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom d'utilisateur</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Niveau</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">XP</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gestion</th> <!-- Nouvelle colonne -->
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <?php foreach ($users as $user) : ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-id"><?= htmlspecialchars($user['id']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 user-username"><?= htmlspecialchars($user['username']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-nom"><?= htmlspecialchars($user['nom']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-prenom"><?= htmlspecialchars($user['prenom']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-email"><?= htmlspecialchars($user['email']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-type_membre"><?= htmlspecialchars($user['type_membre']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-niveau"><?= htmlspecialchars($user['niveau']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-experience"><?= htmlspecialchars($user['points_experience']) ?></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-admin" data-value="<?= $user['admin'] ?>">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?= $user['admin'] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' ?>">
+                                        <?= $user['admin'] ? '✅' : '❌' ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-gestion" data-value="<?= $user['gestion'] ?>"> <!-- Nouvelle colonne -->
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?= $user['gestion'] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' ?>">
+                                        <?= $user['gestion'] ? '✅' : '❌' ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="btn-hover btn-history mr-2 inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" data-id="<?= $user['id'] ?>" data-username="<?= htmlspecialchars($user['username']) ?>">
+                                        Historique
+                                    </button>
+                                    <button class="btn-hover btn-edit mr-2 inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-id="<?= $user['id'] ?>">
+                                        Modifier
+                                    </button>
+                                    <button class="btn-hover btn-delete inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" data-id="<?= $user['id'] ?>">
+                                        Supprimer
+                                    </button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <?php foreach ($users as $user) : ?>
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-id"><?= htmlspecialchars($user['id']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 user-username"><?= htmlspecialchars($user['username']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-nom"><?= htmlspecialchars($user['nom']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-prenom"><?= htmlspecialchars($user['prenom']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-email"><?= htmlspecialchars($user['email']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-type_membre"><?= htmlspecialchars($user['type_membre']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-niveau"><?= htmlspecialchars($user['niveau']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-experience"><?= htmlspecialchars($user['points_experience']) ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 user-admin" data-value="<?= $user['admin'] ?>">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?= $user['admin'] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' ?>">
-                                            <?= $user['admin'] ? '✅' : '❌' ?>
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button class="btn-hover btn-history mr-2 inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" data-id="<?= $user['id'] ?>" data-username="<?= htmlspecialchars($user['username']) ?>">
-                                            Historique
-                                        </button>
-                                        <button class="btn-hover btn-edit mr-2 inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" data-id="<?= $user['id'] ?>">
-                                            Modifier
-                                        </button>
-                                        <button class="btn-hover btn-delete inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" data-id="<?= $user['id'] ?>">
-                                            Supprimer
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                        <?php endforeach; ?>
+                    </tbody></table>
                 </div>
             </div>
 
@@ -521,6 +531,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 let niveau = row.querySelector(".user-niveau").innerText;
                 let experience = row.querySelector(".user-experience").innerText;
                 let admin = row.querySelector(".user-admin").dataset.value;
+                let gestion = row.querySelector(".user-gestion").dataset.value;
 
                 let editForm = `
                     <tr id="editRow" class="edit-form bg-blue-50">
@@ -562,6 +573,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <option value="1" ${admin == 1 ? 'selected' : ''}>✅</option>
                             </select>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <select id="editGestion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                <option value="0" ${gestion == 0 ? 'selected' : ''}>❌</option>
+                                <option value="1" ${gestion == 1 ? 'selected' : ''}>✅</option>
+                            </select>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button class="btn-save btn-hover inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mr-2" data-id="${userId}">
                                 Enregistrer
@@ -593,15 +610,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     let newNiveau = document.getElementById("editNiveau").value;
                     let newExperience = document.getElementById("editExperience").value;
                     let newAdmin = document.getElementById("editAdmin").value;
+                    let newGestion = document.getElementById("editGestion").value;
 
                     fetch("edit_user.php", {
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: `id=${userId}&username=${newUsername}&nom=${newNom}&prenom=${newPrenom}&email=${newEmail}&type_membre=${newTypeMembre}&niveau=${newNiveau}&points_experience=${newExperience}&admin=${newAdmin}`
+                        body: `id=${userId}&username=${newUsername}&nom=${newNom}&prenom=${newPrenom}&email=${newEmail}&type_membre=${newTypeMembre}&niveau=${newNiveau}&points_experience=${newExperience}&admin=${newAdmin}&gestion=${newGestion}`
                     })
-                    .then(response => response.text())
+                    .then(response => response.json())
                     .then(data => {
-                        location.reload();
+                        if (data.success) {
+                            alert(data.message);
+                            location.reload();
+                        } else {
+                            alert(data.message);
+                        }
                     })
                     .catch(error => console.error("Erreur:", error));
                 });
