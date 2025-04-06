@@ -122,28 +122,34 @@ VALUES
 ('janedoe', '123456', 'Doe', 'Jane', '1995-08-20', 28, 'Femme', 'développeur', 'jane.doe@example.com', 'Intermédiaire', 100, 1, 'default.jpg',000001,1,1);
 
 -- Insertion d'un objet connecté avec un utilisateur spécifique
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Lampe intelligente', 'Éclairage', 'Lampe connectée avec réglage de lintensité', 'Philips', 'Actif', 'Wi-Fi', 'Électricité', 75.5, 'Allumé', '37.7749,-122.4194', NULL, 95, 1); -- UtilisateurID = 1
-
--- Insertion d'un autre objet connecté sans utilisateur (UtilisateurID = NULL)
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Caméra de sécurité', 'Surveillance', 'Caméra HD avec vision nocturne', 'Arlo', 'Actif', 'Wi-Fi', 'Batterie', NULL, NULL, '37.7749,-122.4194', NULL, 80, NULL); -- Pas d'utilisateur (UtilisateurID = NULL)
-
--- Insertion d'un autre objet connecté avec un autre utilisateur
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '37.7749,-122.4194', NULL, 100, 2); -- UtilisateurID = 2
-
--- Insertion de trois vélos à San Francisco
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS)
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS, UtilisateurID)
 VALUES 
-('Vélo Urbain 1000', 'Vélo', 'Vélo électrique pour la ville avec moteur de 250W.', 'Marque A', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 25.00, 100, '37.7749,-122.4194'),
-('Vélo Sport 2000', 'Vélo', 'Vélo de sport avec transmission Shimano 21 vitesses.', 'Marque B', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 30.00, 95, '37.7749,-122.4194'),
-('Vélo Cargo', 'Vélo', 'Vélo cargo pour transport de charges lourdes.', 'Marque C', 'Inactif', 'Bluetooth', 'Batterie NiMH', NOW(), 20.00, 80, '37.7749,-122.4194');
+('Vélo Urbain Plus', 'Vélo', 'Vélo urbain électrique avec assistance jusqu\'à 25 km/h', 'VeloTech', 'Actif', 'Bluetooth 5.0', 'Batterie Lithium 36V', NOW(), 18.50, 87, '37.775,-122.419', 1),
+('Vélo Montagne Pro', 'Vélo', 'VTT électrique tout-terrain avec amortisseurs renforcés', 'MountainRide', 'Actif', 'GPS + Bluetooth', 'Batterie Li-ion 48V', NOW(), 22.30, 95, '37.773,-122.421', 1),
+('Vélo Pliant Compact', 'Vélo', 'Vélo pliant pour trajets multimodaux', 'FoldBike', 'Actif', 'NFC + Bluetooth', 'Batterie LFP 24V', NOW(), 15.80, 63, '37.778,-122.412', 1),
+('Vélo Cargo Plus', 'Vélo', 'Vélo cargo électrique avec plateforme avant et arrière', 'CargoMax', 'Inactif', 'Wi-Fi + 4G', 'Batterie Lithium 52V', NOW(), 12.50, 45, '37.782,-122.417', 1),
+('Vélo Route Carbone', 'Vélo', 'Vélo de route ultraléger avec cadre carbone et connectivité', 'SpeedCycle', 'Actif', 'ANT+ + Bluetooth', 'Batterie Lithium 36V', NOW(), 32.10, 78, '37.786,-122.413', 8),
+('Vélo Urbain Classic', 'Vélo', 'Vélo urbain hollandais avec assistance électrique discrète', 'CityRide', 'Actif', 'Bluetooth 4.2', 'Batterie Intégrée 36V', NOW(), 16.70, 92, '37.787,-122.409', 13),
+('Vélo Tandem Connect', 'Vélo', 'Vélo tandem connecté pour deux utilisateurs', 'TandemPro', 'Actif', 'Wi-Fi + GPS', 'Double Batterie 48V', NOW(), 20.40, 83, '37.779,-122.414', 15);
 
--- Insertion de quatre trottinettes à San Francisco
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS)
-VALUES
-('Trottinette Electrique X1', 'Trottinette', 'Trottinette électrique avec moteur de 250W.', 'Marque D', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 15.00, 100, '37.7749,-122.4194'),
-('Trottinette Electrique X2', 'Trottinette', 'Trottinette pour trajets urbains avec système de freinage électronique.', 'Marque E', 'Actif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 18.00, 85, '37.7749,-122.4194'),
-('Trottinette Sport T3', 'Trottinette', 'Trottinette sport avec roues renforcées.', 'Marque F', 'Actif', 'Bluetooth', 'Batterie Lithium', NOW(), 20.00, 50, '37.7749,-122.4194'),
-('Trottinette Connectée T4', 'Trottinette', 'Trottinette connectée avec suivi GPS et autonomie améliorée.', 'Marque G', 'Inactif', 'Wi-Fi', 'Batterie Li-ion', NOW(), 22.00, 90, '37.7749,-122.4194');
+
+-- Insertion de 7 trottinettes à San Francisco
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS, UtilisateurID)
+VALUES 
+('Trottinette Urban Fly', 'Trottinette', 'Trottinette urbaine pliable avec autonomie de 35km', 'ScootCity', 'Actif', 'Bluetooth + 4G', 'Batterie Lithium 36V', NOW(), 21.60, 81, '37.774,-122.425', 2),
+('Trottinette Extreme X3', 'Trottinette', 'Trottinette tout-terrain avec suspensions avant et arrière', 'XtremeScoot', 'Actif', 'GPS + Bluetooth', 'Batterie Li-ion 48V', NOW(), 29.80, 76, '37.771,-122.428', 5),
+('Trottinette Mini Fold', 'Trottinette', 'Trottinette ultra-compacte et légère pour déplacements urbains', 'MiniScoot', 'Inactif', 'Bluetooth 5.0', 'Batterie Lithium 24V', NOW(), 15.20, 39, '37.769,-122.422', 5),
+('Trottinette Pro Racer', 'Trottinette', 'Trottinette sportive haute performance', 'RacerScoot', 'Actif', 'Wi-Fi + NFC', 'Batterie Lithium 48V', NOW(), 32.50, 88, '37.767,-122.431', 5),
+('Trottinette City Commuter', 'Trottinette', 'Trottinette pour trajets quotidiens avec porte-bagages', 'CommuteScoot', 'Actif', 'Bluetooth + GPS', 'Batterie Li-ion 36V', NOW(), 22.80, 72, '37.765,-122.418', 11),
+('Trottinette Luxury S1', 'Trottinette', 'Trottinette premium avec éclairage LED et tableau de bord numérique', 'LuxScoot', 'Actif', 'Wi-Fi + 4G + Bluetooth', 'Batterie Lithium 48V', NOW(), 25.60, 95, '37.762,-122.416', 12),
+('Trottinette Eco E1', 'Trottinette', 'Trottinette écologique avec matériaux recyclés', 'EcoScoot', 'Actif', 'Bluetooth Low Energy', 'Batterie Solaire + Li-ion', NOW(), 18.90, 85, '37.759,-122.426', 14);
+
+-- Insertion de 6 voitures à San Francisco
+INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS, UtilisateurID)
+VALUES 
+('Voiture Électrique Model S', 'Voiture', 'Berline électrique connectée avec autonomie de 600km', 'EcoDrive', 'Actif', 'Wi-Fi + 5G + Bluetooth', 'Batterie Lithium-ion 100kWh', NOW(), 65.30, 92, '37.789,-122.432', 1),
+('Voiture Hybride Compact', 'Voiture', 'Citadine hybride avec consommation réduite', 'HybridCity', 'Actif', 'Bluetooth + 4G', 'Hybride Essence-Électrique', NOW(), 45.80, 78, '37.791,-122.428', 4),
+('SUV Électrique X1', 'Voiture', 'SUV électrique avec 7 places et connectivité avancée', 'GreenSUV', 'Actif', 'Wi-Fi + 5G + GPS', 'Batterie Lithium 120kWh', NOW(), 53.20, 85, '37.795,-122.421', 5),
+('Voiture Autonome Pilote', 'Voiture', 'Berline avec capacités de conduite autonome niveau 3', 'AutoDrive', 'Actif', 'Wi-Fi + 5G + LIDAR', 'Batterie Lithium-ion 90kWh', NOW(), 58.70, 76, '37.798,-122.431', 8),
+('Mini Électrique City', 'Voiture', 'Mini voiture électrique pour usage urbain', 'MiniElec', 'Inactif', 'Bluetooth + 4G', 'Batterie Lithium 50kWh', NOW(), 40.20, 32, '37.802,-122.419', 10),
+('Sport Électrique GT', 'Voiture', 'Voiture sport électrique haute performance', 'SpeedElec', 'Actif', 'Wi-Fi + 5G + GPS', 'Batterie Lithium 130kWh', NOW(), 92.50, 88, '37.796,-122.407', 15);
