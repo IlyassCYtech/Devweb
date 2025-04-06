@@ -658,6 +658,16 @@ try {
         userIsAdmin = false;
     }
 
+    // Récupérer l'état gestionnaire de l'utilisateur (défini dans le PHP)
+    let userIsGestion;
+    try {
+        // Cette valeur devrait être définie par PHP dans le HTML
+        userIsGestion = typeof userIsGestion !== 'undefined' ? userIsGestion : false;
+    } catch (error) {
+        console.error("Erreur lors de la récupération du statut gestionnaire:", error);
+        userIsGestion = false;
+    }
+
     function createPopup(content) {
         try {
             // Supprimer tout popup existant
@@ -719,12 +729,21 @@ try {
                     console.error("Erreur lors de la redirection vers la page admin:", error);
                     alert("Impossible d'accéder à la page d'administration. Veuillez réessayer.");
                 }
+            } else if (userIsGestion) {
+                createPopup(`
+                    🔑 <strong>Vos droits actuels</strong> 🔑<br><br>
+                    - Vous pouvez consulter les objets connectés.<br>
+                    - Vous pouvez gérer les objets connectés.<br>
+                    - Vous pouvez gagner de l'XP et monter de niveau.<br>
+                    - <span class="text-blue-600">Au niveau Expert</span>, vous pourrez devenir Administrateur !
+                `);
             } else {
                 createPopup(`
                     🔒 <strong>Vos droits actuels</strong> 🔒<br><br>
                     - Vous pouvez consulter les objets connectés.<br>
                     - Vous pouvez gagner de l'XP et monter de niveau.<br>
-                    - <span class="text-blue-600">Au niveau Expert</span>, vous pourrez devenir Administrateur !
+                    - <span class="text-blue-600">Au niveau Expert</span>, vous pourrez devenir Administrateur ! <br>
+                    - <span class="text-yellow-600">Au niveau Avancé</span>, vous pourrez devenir Gestionnaire !
                 `);
             }
         });

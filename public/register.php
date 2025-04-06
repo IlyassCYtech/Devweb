@@ -1,6 +1,6 @@
 <?php
 // Démarrer la session
-
+session_start();
 
 // Inclure la connexion à la DB
 $pdo = require_once('../includes/db_connect.php');
