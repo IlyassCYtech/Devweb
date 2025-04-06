@@ -193,6 +193,9 @@ try {
         ':type_action' => 'Modification du profil'
     ]);
 
+// Transmettre la valeur de 'gestion' au JavaScript
+echo "<script>const userGestion = " . (isset($user['gestion']) ? json_encode($user['gestion']) : 'null') . ";</script>";
+
 } catch (PDOException $e) {
     die("Erreur de base de données : " . $e->getMessage());
 }
@@ -729,7 +732,7 @@ try {
                     console.error("Erreur lors de la redirection vers la page admin:", error);
                     alert("Impossible d'accéder à la page d'administration. Veuillez réessayer.");
                 }
-            } else if (userIsGestion) {
+            } else if (userGestion  ) {
                 createPopup(`
                     🔑 <strong>Vos droits actuels</strong> 🔑<br><br>
                     - Vous pouvez consulter les objets connectés.<br>
@@ -742,8 +745,9 @@ try {
                     🔒 <strong>Vos droits actuels</strong> 🔒<br><br>
                     - Vous pouvez consulter les objets connectés.<br>
                     - Vous pouvez gagner de l'XP et monter de niveau.<br>
-                    - <span class="text-blue-600">Au niveau Expert</span>, vous pourrez devenir Administrateur ! <br>
-                    - <span class="text-yellow-600">Au niveau Avancé</span>, vous pourrez devenir Gestionnaire !
+                    - <span class="text-yellow-600">Au niveau Avancé</span>, vous pourrez devenir Gestionnaire ! <br>
+                    - <span class="text-blue-600">Au niveau Expert</span>, vous pourrez devenir Administrateur ! 
+                    
                 `);
             }
         });
