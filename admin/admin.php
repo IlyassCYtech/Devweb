@@ -84,6 +84,10 @@ try {
     die("Erreur interne, veuillez réessayer plus tard.");
 }
 
+// Récupérer les demandes de création de type d'objet
+$stmtDemandes = $pdo->query("SELECT d.id, d.type_objet, d.date_demande, d.statut, u.username FROM DemandesTypeObjet d JOIN users u ON d.user_id = u.id ORDER BY d.date_demande DESC");
+$demandes = $stmtDemandes->fetchAll(PDO::FETCH_ASSOC);
+
 // Fonction pour récupérer l'historique d'un utilisateur (pour AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'get_history') {
     try {
@@ -454,6 +458,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
                                             <button type="submit" name="action" value="reject" class="px-4 py-2 bg-red-500 text-white rounded">Rejeter</button>
                                         </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section des demandes de création de type d'objet -->
+            <div class="glass-card rounded-2xl p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Demandes de création de type d'objet</h2>
+                <div class="table-container bg-white">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type demandé</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($demandes as $demande): ?>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($demande['username']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($demande['type_objet']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($demande['date_demande']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($demande['statut']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <?php if ($demande['statut'] === 'En attente'): ?>
+                                            <form method="POST" action="gerer_demande.php" enctype="multipart/form-data" class="inline">
+                                                <input type="hidden" name="id" value="<?= $demande['id'] ?>">
+                                                <input type="file" name="type_image" accept="image/jpeg, image/png, image/gif" required class="mb-2">
+                                                <button type="submit" name="action" value="approve" class="px-4 py-2 bg-green-500 text-white rounded">Approuver</button>
+                                                <button type="submit" name="action" value="reject" class="px-4 py-2 bg-red-500 text-white rounded">Rejeter</button>
+                                            </form>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
