@@ -6,8 +6,11 @@
     <title>Golden Gate Bridge - San Francisco</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #fefefe;
+            font-family: 'Poppins', sans-serif;
+            background-image: url('../../../assets/images/backgrounddeux.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             margin: 0;
             padding: 30px;
             color: #2c3e50;
@@ -17,11 +20,28 @@
             max-width: 800px;
             margin: auto;
             text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 {
-            font-size: 36px;
+            font-size: 3rem;
             color: #e53935;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
         }
 
         img {
@@ -30,6 +50,12 @@
             object-fit: cover;
             border-radius: 12px;
             margin: 20px 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
 
         p {
@@ -44,13 +70,19 @@
             text-decoration: none;
             color: #00695c;
             font-weight: bold;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        a.back:hover {
+            color: #004d40;
+            transform: translateY(-3px);
         }
     </style>
 </head>
 <body>
     <div class="content">
         <h1>Golden Gate Bridge</h1>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0c/GoldenGateBridge-001.jpg" alt="Golden Gate Bridge">
+        <img src="golden_gate.jpg" alt="Golden Gate Bridge">
         <p>Le Golden Gate Bridge est un pont suspendu reliant San Francisco à Marin County. Construit en 1937, il est célèbre pour sa couleur rouge orangé et ses vues spectaculaires. C’est un symbole emblématique de la ville et un chef-d'œuvre d’ingénierie.</p>
         <a href="../monument.php" class="back">← Retour à la liste des monuments</a>
     </div>

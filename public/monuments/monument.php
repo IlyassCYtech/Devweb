@@ -7,23 +7,49 @@
     <style>
         body {
             margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #e0f7fa, #fce4ec);
+            font-family: 'Poppins', sans-serif;
+            background-image: url('../../assets/images/backgrounddeux.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             color: #2c3e50;
+            animation: fadeIn 1.5s ease-in-out;
         }
-        h1 {
-            text-align: center;
-            font-size: 42px;
-            margin-top: 40px;
-            margin-bottom: 10px;
-            color: #1a237e;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
-        p.subtitle {
+
+        .header-container {
             text-align: center;
-            font-size: 18px;
-            color: #4a4a4a;
             margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            color: #007bff;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        p.subtitle {
+            font-size: 1.2rem;
+            color: #555;
+            margin: 10px 0 0;
+        }
+
         .container {
             display: flex;
             flex-wrap: wrap;
@@ -31,64 +57,83 @@
             gap: 30px;
             padding: 0 40px 60px;
         }
+
         .monument {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 18px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
             overflow: hidden;
             width: 320px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             text-decoration: none;
         }
+
         .monument:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
         }
+
         .monument img {
             width: 100%;
             height: 200px;
             object-fit: cover;
+            transition: transform 0.3s ease;
         }
+
+        .monument:hover img {
+            transform: scale(1.05);
+        }
+
         .monument-content {
             padding: 20px;
         }
+
         .monument-content h2 {
-            font-size: 22px;
+            font-size: 1.8rem;
             color: #00695c;
             margin-bottom: 10px;
         }
+
         .monument-content p {
-            font-size: 15px;
+            font-size: 1rem;
             line-height: 1.6;
+            color: #555;
         }
+
         .back-button {
             display: block;
             margin: 20px auto;
             padding: 10px 20px;
-            background-color: #1a237e;
+            background-color: #007bff;
             color: white;
             text-align: center;
             border-radius: 5px;
             text-decoration: none;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
+
         .back-button:hover {
-            background-color: #3949ab;
+            background-color: #0056b3;
+            transform: translateY(-3px);
         }
+
         footer {
             text-align: center;
             padding: 30px 10px;
-            background: #f1f8e9;
-            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
             color: #777;
+            border-top: 1px solid #ddd;
         }
     </style>
 </head>
 <body>
 
-    <h1>🌉 Monuments à découvrir à San Francisco</h1>
-    <p class="subtitle">Explore les lieux emblématiques de la ville entre mer, collines et légendes.</p>
+    <div class="header-container">
+        <h1>🌉 Monuments à découvrir à San Francisco</h1>
+        <p class="subtitle">Explore les lieux emblématiques de la ville entre mer, collines et légendes.</p>
+    </div>
 
     <a href="../index.php" class="back-button">Retour à l'accueil</a>
 

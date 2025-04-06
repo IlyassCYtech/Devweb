@@ -6,8 +6,11 @@
     <title>Lombard Street - San Francisco</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #fefefe;
+            font-family: 'Poppins', sans-serif;
+            background-image: url('../../../assets/images/backgrounddeux.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             margin: 0;
             padding: 30px;
             color: #2c3e50;
@@ -17,11 +20,28 @@
             max-width: 800px;
             margin: auto;
             text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1 {
-            font-size: 36px;
+            font-size: 3rem;
             color: #e53935;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
         }
 
         img {
@@ -30,6 +50,12 @@
             object-fit: cover;
             border-radius: 12px;
             margin: 20px 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
 
         p {
@@ -44,14 +70,20 @@
             text-decoration: none;
             color: #00695c;
             font-weight: bold;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        a.back:hover {
+            color: #004d40;
+            transform: translateY(-3px);
         }
     </style>
 </head>
 <body>
     <div class="content">
         <h1>Lombard Street</h1>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/LombardStreet_SanFrancisco.jpg" alt="Lombard Street">
-        <p>Lombard Street est célèbre pour sa portion très sinueuse, souvent appelée la rue la plus tortueuse du monde. Elle est bordée de fleurs et attire chaque année des milliers de touristes.</p>
+        <img src="lombard_street.jpg" alt="Lombard Street">
+        <p>Lombard Street est célèbre pour son tronçon sinueux bordé de fleurs. Située dans le quartier de Russian Hill, elle est souvent appelée "la rue la plus sinueuse du monde".</p>
         <a href="../monument.php" class="back">← Retour à la liste des monuments</a>
     </div>
 </body>
