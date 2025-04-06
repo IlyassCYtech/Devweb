@@ -1,5 +1,14 @@
--- Suppression des tables si elles existent
-DROP TABLE IF EXISTS Acces, Historique_Actions, Administration, ObjetConnecte, NivUtilisateur, users, TypeObjet,email_confirmations;
+-- Suppression des tables dans le bon ordre pour respecter les contraintes de clé étrangère
+DROP TABLE IF EXISTS UserHistory;
+DROP TABLE IF EXISTS DeleteRequests;
+DROP TABLE IF EXISTS Historique_Actions;
+DROP TABLE IF EXISTS Acces;
+DROP TABLE IF EXISTS Administration;
+DROP TABLE IF EXISTS ObjetConnecte;
+DROP TABLE IF EXISTS NivUtilisateur;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS TypeObjet;
+DROP TABLE IF EXISTS email_confirmations;
 
 -- Création de la table des utilisateurs
 CREATE TABLE users (
@@ -33,10 +42,6 @@ CREATE TABLE Acces (
     FOREIGN KEY (IDUtilisateur) REFERENCES users(id) ON DELETE CASCADE
 );
 
-
-
-
-
 -- Création de la table des objets connectés
 -- Création de la table des objets connectés avec la colonne UtilisateurID correctement définie
 CREATE TABLE ObjetConnecte (
@@ -64,8 +69,6 @@ CREATE TABLE TypeObjet (
     Nom VARCHAR(100) NOT NULL UNIQUE
 );
 
-
--- Création de la table de l'historique des actions
 -- Création de la table de l'historique des actions
 CREATE TABLE Historique_Actions (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -77,7 +80,6 @@ CREATE TABLE Historique_Actions (
     FOREIGN KEY (id_objet_connecte) REFERENCES ObjetConnecte(ID) ON DELETE SET NULL
 );
 
-
 -- Création de la table d'administration
 CREATE TABLE Administration (
     ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -86,25 +88,38 @@ CREATE TABLE Administration (
     FOREIGN KEY (IDUtilisateur) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Création de la table des demandes de suppression
+CREATE TABLE DeleteRequests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    object_id INT NOT NULL,
+    request_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (object_id) REFERENCES ObjetConnecte(ID) ON DELETE CASCADE
+);
+
+-- Création de la table de l'historique des connexions/inscriptions
+CREATE TABLE UserHistory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action_type ENUM('Connexion', 'Déconnexion', 'Inscription') NOT NULL,
+    action_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
 INSERT INTO TypeObjet (Nom) VALUES 
 ('Vélo'),
 ('Trottinette'),
 ('voiture');
 
-
 -- Insertion d'un utilisateur test
 INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil,confirmation_code,is_confirmed,is_confirmed_by_ad)
-VALUES ('johndoe', '123', 'Doe', 'John', '1990-05-15', 34, 'Homme', 'élève', 'admin@gmail.com', 'Débutant', 100, 1, 'uploads/default.jpg',000000,1,1);
-
+VALUES ('johndoe', '123', 'Doe', 'John', '1990-05-15', 34, 'Homme', 'élève', 'admin@gmail.com', 'Débutant', 100, 1, 'default.jpg',000000,1,1);
 
 -- Insertion d'un utilisateur test
 INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil,confirmation_code,is_confirmed,is_confirmed_by_ad)
 VALUES 
-('janedoe', '123456', 'Doe', 'Jane', '1995-08-20', 28, 'Femme', 'développeur', 'jane.doe@example.com', 'Intermédiaire', 100, 1, 'uploads/default.jpg',000001,1,1);
-
-
-
+('janedoe', '123456', 'Doe', 'Jane', '1995-08-20', 28, 'Femme', 'développeur', 'jane.doe@example.com', 'Intermédiaire', 100, 1, 'default.jpg',000001,1,1);
 
 -- Insertion d'un objet connecté avec un utilisateur spécifique
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
@@ -114,12 +129,9 @@ VALUES ('Lampe intelligente', 'Éclairage', 'Lampe connectée avec réglage de l
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
 VALUES ('Caméra de sécurité', 'Surveillance', 'Caméra HD avec vision nocturne', 'Arlo', 'Actif', 'Wi-Fi', 'Batterie', NULL, NULL, '37.7749,-122.4194', NULL, 80, NULL); -- Pas d'utilisateur (UtilisateurID = NULL)
 
-
-
 -- Insertion d'un autre objet connecté avec un autre utilisateur
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
 VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '37.7749,-122.4194', NULL, 100, 2); -- UtilisateurID = 2
-
 
 -- Insertion de trois vélos à San Francisco
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS)
