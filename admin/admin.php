@@ -53,6 +53,36 @@ try {
     die("Erreur interne, veuillez réessayer plus tard.");
 }
 
+try {
+    // Fetch delete requests
+    $requestsStmt = $pdo->prepare("
+        SELECT dr.id, dr.request_date, u.username, o.Nom AS object_name
+        FROM DeleteRequests dr
+        JOIN users u ON dr.user_id = u.id
+        JOIN ObjetConnecte o ON dr.object_id = o.ID
+        ORDER BY dr.request_date DESC
+    ");
+    $requestsStmt->execute();
+    $deleteRequests = $requestsStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    log_error("Erreur lors de la récupération des demandes de suppression: " . $e->getMessage());
+    die("Erreur interne, veuillez réessayer plus tard.");
+}
+
+try {
+    // Récupérer l'historique des connexions/inscriptions
+    $historyStmt = $pdo->prepare("
+        SELECT uh.action_date, uh.action_type, u.username, u.photo_profil 
+        FROM UserHistory uh
+        JOIN users u ON uh.user_id = u.id
+        ORDER BY uh.action_date DESC
+    ");
+    $historyStmt->execute();
+    $userHistory = $historyStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    log_error("Erreur lors de la récupération de l'historique des utilisateurs: " . $e->getMessage());
+    die("Erreur interne, veuillez réessayer plus tard.");
+}
 
 // Fonction pour récupérer l'historique d'un utilisateur (pour AJAX)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'get_history') {
@@ -379,6 +409,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($obj['Connectivite']) ?></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($obj['EnergieUtilisee']) ?></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($obj['DerniereInteraction']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Delete Requests Section -->
+            <div class="glass-card rounded-2xl p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Demandes de suppression</h2>
+                <div class="table-container bg-white">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Objet</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date de demande</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($deleteRequests as $request): ?>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($request['username']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($request['object_name']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($request['request_date']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <form method="POST" action="handle_request.php" class="inline">
+                                            <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
+                                            <button type="submit" name="action" value="approve" class="px-4 py-2 bg-green-500 text-white rounded">Approuver</button>
+                                        </form>
+                                        <form method="POST" action="handle_request.php" class="inline">
+                                            <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
+                                            <button type="submit" name="action" value="reject" class="px-4 py-2 bg-red-500 text-white rounded">Rejeter</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Historique des Connexions/Inscription</h2>
+                <div class="table-container bg-white">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($userHistory as $history): ?>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <img src="../uploads/<?= htmlspecialchars($history['photo_profil']) ?>" alt="Photo de profil" class="h-10 w-10 rounded-full">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($history['username']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($history['action_type']) ?></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($history['action_date']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
