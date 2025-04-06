@@ -2,6 +2,8 @@
 DROP TABLE IF EXISTS UserHistory;
 DROP TABLE IF EXISTS DeleteRequests;
 DROP TABLE IF EXISTS Historique_Actions;
+DROP TABLE IF EXISTS DemandesTypeObjet;
+
 DROP TABLE IF EXISTS Acces;
 DROP TABLE IF EXISTS Administration;
 DROP TABLE IF EXISTS ObjetConnecte;
@@ -9,7 +11,6 @@ DROP TABLE IF EXISTS NivUtilisateur;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS TypeObjet;
 DROP TABLE IF EXISTS email_confirmations;
-DROP TABLE IF EXISTS DemandesTypeObjet;
 
 -- Création de la table des utilisateurs
 CREATE TABLE users (
