@@ -88,32 +88,52 @@ $weatherEmoji = $emojiMapping[strtolower($weatherDescription)] ?? '🌍';
             background-position: center;
             background-attachment: fixed;
             color: #333;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
 
         .container {
-            max-width: 800px; /* Réduction de la largeur */
-            margin: 125px auto; /* Réduction de la marge */
-            padding: 15px; /* Réduction du padding */
-            background: rgba(255, 255, 255, 0.85); /* Transparence plus marquée */
-            border-radius: 10px; /* Bordures légèrement arrondies */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Ombre plus douce */
+            max-width: 900px;
+            margin: 100px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .header {
-            flex: 1;
-            text-align: left;
-            padding-right: 20px;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             color: #007bff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
@@ -122,25 +142,36 @@ $weatherEmoji = $emojiMapping[strtolower($weatherDescription)] ?? '🌍';
         }
 
         .weather-card {
-            flex: 1;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px;
+            padding: 25px;
             border: 1px solid #ddd;
             border-radius: 15px;
-            background: rgba(255, 255, 255, 0.9); /* Légère transparence */
+            background: rgba(255, 255, 255, 0.95);
             transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            max-width: 700px;
         }
 
         .weather-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
         }
 
         .weather-card .icon img {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .weather-card .details {
@@ -149,7 +180,7 @@ $weatherEmoji = $emojiMapping[strtolower($weatherDescription)] ?? '🌍';
         }
 
         .weather-card .details h3 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 600;
             margin-bottom: 10px;
             color: #333;
@@ -162,31 +193,36 @@ $weatherEmoji = $emojiMapping[strtolower($weatherDescription)] ?? '🌍';
         }
 
         .footer {
-            max-width: 500px; /* Réduction de la largeur */
-            margin: 20px auto; /* Centrage horizontal et espacement vertical */
-            padding: 15px; /* Ajustement du padding */
-            background: rgba(255, 255, 255, 0.85); /* Transparence pour le fond */
-            border-radius: 10px; /* Bordures légèrement arrondies */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Ombre plus douce */
-            text-align: center; /* Centrage du texte */
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
         }
 
         .footer a {
-            color: #007bff; /* Couleur bleue pour le lien */
+            color: #007bff;
             font-weight: bold;
             text-decoration: none;
             padding: 5px 10px;
             border-radius: 5px;
-            transition: color 0.3s;
+            transition: color 0.3s, background-color 0.3s;
         }
 
         .footer a:hover {
-            color: #0056b3; /* Couleur bleue plus sombre au survol */
+            color: #fff;
+            background-color: #007bff;
         }
 
         .alert {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 500;
+            color: #d9534f;
+            background: rgba(255, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
         }
     </style>
 </head>
