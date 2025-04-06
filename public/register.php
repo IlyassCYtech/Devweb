@@ -1,6 +1,6 @@
 <?php
 // Démarrer la session
-session_start();
+
 
 // Inclure la connexion à la DB
 $pdo = require_once('../includes/db_connect.php');
@@ -22,14 +22,30 @@ require '../vendor/autoload.php';
 try {
     // Vérifier si le formulaire est soumis
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // Vider la session existante pour éviter les conflits
+        session_unset();
+        session_destroy();
+        session_start();
+
         // Récupérer les données du formulaire avec nettoyage
         $username = trim($_POST['username']);
         $password = trim($_POST['password']);
         $nom = trim($_POST['nom']);
         $prenom = trim($_POST['prenom']);
         $date_naissance = trim($_POST['date_naissance']);
-        $age = (int)$_POST['age'];
-        
+
+        // Vérification de la date de naissance
+        $currentDate = new DateTime();
+        $birthDate = DateTime::createFromFormat('Y-m-d', $date_naissance);
+        if (!$birthDate || $birthDate > $currentDate) {
+            log_error("Date de naissance invalide : $date_naissance");
+            echo json_encode(['success' => false, 'message' => 'Date de naissance invalide.']);
+            exit();
+        }
+
+        // Calcul de l'âge
+        $age = $currentDate->diff($birthDate)->y;
+
         // Vérifier et forcer la validité de "sexe"
         $sexe = ucfirst(strtolower(trim($_POST['sexe'])));
         $valid_sexes = ['Homme', 'Femme', 'Autre'];
@@ -49,9 +65,6 @@ try {
         }
 
         $type_membre = trim($_POST['type_membre']);
-        $niveau = trim($_POST['niveau']);
-        $points_experience = (int)$_POST['  points_experience'];
-        $admin = isset($_POST['admin']) ? (int)$_POST['admin'] : 0;
         $photo = 'default.jpg';
 
         // Vérification de la longueur et la complexité du mot de passe
@@ -100,12 +113,12 @@ try {
         $confirmationCode = bin2hex(random_bytes(16));
 
         // Préparer et exécuter la requête avec PDO
-        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, niveau, points_experience, admin, photo_profil, confirmation_code, is_confirmed, is_confirmed_by_ad) 
-        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :niveau, :points_experience, :admin, :photo_profil, :confirmation_code, 0, 0)');
+        $stmt = $pdo->prepare('INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, type_membre, email, photo_profil, confirmation_code, is_confirmed, is_confirmed_by_ad) 
+        VALUES (:username, :password, :nom, :prenom, :date_naissance, :age, :sexe, :type_membre, :email, :photo_profil, :confirmation_code, 0, 0)');
         
         $stmt->execute([
             ':username'         => $username,
-            ':password'         => $hashedPassword,  // Mot de passe haché
+            ':password'         => $hashedPassword,
             ':nom'              => $nom,
             ':prenom'           => $prenom,
             ':date_naissance'   => $date_naissance,
@@ -113,11 +126,8 @@ try {
             ':sexe'             => $sexe,
             ':type_membre'      => $type_membre,
             ':email'            => $email,
-            ':niveau'           => $niveau,
-            ':points_experience'=> $points_experience,
-            ':admin'            => $admin,
             ':photo_profil'     => $photo,
-            ':confirmation_code'=> $confirmationCode // Ajouter le code de confirmation
+            ':confirmation_code'=> $confirmationCode
         ]);
 
         // Récupérer l'ID du dernier utilisateur inséré
@@ -125,6 +135,7 @@ try {
 
         // Enregistrer l'ID de l'utilisateur dans la session
         $_SESSION['user_id'] = $user_id;
+        $_SESSION['username'] = $username;
 
         // Enregistrer l'action dans l'historique
         $historyStmt = $pdo->prepare("

@@ -39,11 +39,16 @@ if (isset($_GET['code'])) {
                     $user=$updatedUser;
                     echo "Nouvelle valeur de is_confirmed après mise à jour : " . $updatedUser['is_confirmed'] . "<br>";
 
+                    // Vider la session existante pour éviter les conflits
+                    session_unset();
+                    session_destroy();
+                    session_start();
+
                     // L'utilisateur est maintenant confirmé, enregistrer l'ID de l'utilisateur dans la session
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['is_confirmed']=$user['is_confirmed'];
                     // Rediriger vers la page du tableau de bord
-                    header('Location: dashboard.php');
+                    header('Location: ../public/index.php');
                     exit();
                 } else {
                     $errorInfo = $updateStmt->errorInfo();

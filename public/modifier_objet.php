@@ -17,11 +17,14 @@ $stmt->execute([':id' => $object_id]);
 $object = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Récupérer les informations de l'utilisateur pour vérifier s'il est admin
-$userStmt = $conn->prepare("SELECT admin FROM users WHERE id = :user_id");
+$userStmt = $conn->prepare("SELECT admin,gestion FROM users WHERE id = :user_id");
 $userStmt->execute([':user_id' => $user_id]);
 $userInfo = $userStmt->fetch(PDO::FETCH_ASSOC);
 $isAdmin = $userInfo['admin'] ?? 0;
-
+if($userInfo['gestion'] !=1 && $userInfo['admin'] !=1){
+    header("Location: objets.php");
+    exit();
+}
 // Vérifications de sécurité
 if (!$object) {
     $_SESSION['error_message'] = "Cet objet n'existe pas.";
@@ -40,7 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->beginTransaction();
 
-        // Handle delete request
+        // Handle delete request for admins
+        if (isset($_POST['delete']) && $isAdmin) {
+            $deleteStmt = $conn->prepare("DELETE FROM ObjetConnecte WHERE ID = :id");
+            $deleteStmt->execute([':id' => $object_id]);
+
+            $conn->commit();
+            echo json_encode(['success' => true]);
+            exit();
+        }
+
+        // Handle delete request for non-admins
         if (isset($_POST['request_delete'])) {
             $deleteRequestStmt = $conn->prepare("
                 INSERT INTO DeleteRequests (user_id, object_id, request_date)
@@ -269,34 +282,63 @@ $lng = isset($coordinates[1]) ? trim($coordinates[1]) : 2.3522;
                 <!-- filepath: /home/cytech/Devweb-main/Devweb-main/public/modifier_objet.php -->
                 <div class="mt-6">
                     <h2 class="text-lg font-semibold mb-4">Actions</h2>
-                    <button id="request-delete" 
-                            class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600">
-                        Demander la suppression
-                    </button>
-                </div>
-
-                <script>
-                    document.getElementById('request-delete').addEventListener('click', () => {
-                        if (confirm('Voulez-vous vraiment demander la suppression de cet objet ?')) {
-                            fetch('modifier_objet.php?id=<?= $object_id ?>', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                body: 'request_delete=true'
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert('Votre demande de suppression a été envoyée.');
-                                } else {
-                                    alert('Erreur : ' + data.error);
+                    <?php if ($isAdmin): ?>
+                        <button id="delete-object" 
+                                class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600">
+                            Supprimer
+                        </button>
+                        <script>
+                            document.getElementById('delete-object').addEventListener('click', () => {
+                                if (confirm('Voulez-vous vraiment supprimer cet objet ?')) {
+                                    fetch('modifier_objet.php?id=<?= $object_id ?>', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                        },
+                                        body: 'delete=true'
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            alert('L\'objet a été supprimé avec succès.');
+                                            window.location.href = 'objets.php';
+                                        } else {
+                                            alert('Erreur : ' + data.error);
+                                        }
+                                    })
+                                    .catch(error => console.error('Erreur:', error));
                                 }
-                            })
-                            .catch(error => console.error('Erreur:', error));
-                        }
-                    });
-                </script>
+                            });
+                        </script>
+                    <?php else: ?>
+                        <button id="request-delete" 
+                                class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600">
+                            Demander la suppression
+                        </button>
+                        <script>
+                            document.getElementById('request-delete').addEventListener('click', () => {
+                                if (confirm('Voulez-vous vraiment demander la suppression de cet objet ?')) {
+                                    fetch('modifier_objet.php?id=<?= $object_id ?>', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                        },
+                                        body: 'request_delete=true'
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            alert('Votre demande de suppression a été envoyée.');
+                                        } else {
+                                            alert('Erreur : ' + data.error);
+                                        }
+                                    })
+                                    .catch(error => console.error('Erreur:', error));
+                                }
+                            });
+                        </script>
+                    <?php endif; ?>
+                </div>
 
                 <div>
                     <h2 class="text-lg font-semibold mb-4">Informations</h2>

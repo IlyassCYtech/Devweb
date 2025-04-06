@@ -29,7 +29,7 @@ if (isset($_POST['objectID']) && isset($_POST['userID'])) {
         $user = $stmt3->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            $currentXP = $user['points_experience'] + 100; // Ajout des 100 XP
+            $currentXP = $user['points_experience'] + 1000; // Ajout des 100 XP
             $currentLevel = $user['niveau'];
 
             // Liste des niveaux
@@ -52,12 +52,19 @@ if (isset($_POST['objectID']) && isset($_POST['userID'])) {
             else{
                 $newAdmin=0;
             }
+            if($newLevel=='Avancé' || $user['gestion']==1){
+                $newGestion=1;
+            }
+            else{
+                $newGestion=0;
+            }
             // 4️⃣ Mettre à jour l'XP et le niveau de l'utilisateur
-            $stmt4 = $conn->prepare("UPDATE users SET points_experience = :xp, niveau = :niveau, admin = :admin WHERE id = :userID");
+            $stmt4 = $conn->prepare("UPDATE users SET points_experience = :xp, niveau = :niveau, admin = :admin , gestion = :gestion WHERE id = :userID");
             $stmt4->bindParam(':xp', $newXP, PDO::PARAM_INT);
             $stmt4->bindParam(':niveau', $newLevel, PDO::PARAM_STR);
             $stmt4->bindParam(':userID', $userID, PDO::PARAM_INT);
             $stmt4->bindParam(':admin', $newAdmin, PDO::PARAM_INT);
+            $stmt4->bindParam(':gestion', $newGestion, PDO::PARAM_INT);
             $stmt4->execute();
         }
 

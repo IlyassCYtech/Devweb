@@ -11,6 +11,7 @@ if ($_SESSION['is_confirmed'] != 1 || $_SESSION['is_confirmed_by_ad'] != 1) {
     header("Location: index.php");
     exit();
 }
+
 $user_id = $_SESSION['user_id'];
 
 // Fonction de validation
@@ -48,11 +49,14 @@ function validateInput($data, $maxLength = 255, $type = 'text') {
 }
 
 // Récupérer les informations de l'utilisateur
-$stmt = $conn->prepare("SELECT id, username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, admin FROM users WHERE id = :id");
+$stmt = $conn->prepare("SELECT id, username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, admin,gestion FROM users WHERE id = :id");
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+if($user['gestion']!=1 && $user['admin'] !=1){
+    header("Location: objets.php");
+    exit();
+}
 // Récupérer les types d'objets disponibles
 $typeStmt = $conn->prepare("SELECT * FROM TypeObjet");
 $typeStmt->execute();

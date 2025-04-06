@@ -668,18 +668,13 @@ try {
                     <input type="date" name="date_naissance" id="date_naissance" class="form-control border-success" required>
                 </div>
                 <div class="col-md-6">
-                    <label for="age" class="form-label">Âge</label>
-                    <input type="number" name="age" id="age" class="form-control border-success" required>
+                    <label for="sexe" class="form-label">Sexe/Genre</label>
+                    <select name="sexe" id="sexe" class="form-select border-success" required>
+                        <option value="Homme">Homme</option>
+                        <option value="Femme">Femme</option>
+                        <option value="Autre">Autre</option>
+                    </select>
                 </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="sexe" class="form-label">Sexe/Genre</label>
-                <select name="sexe" id="sexe" class="form-select border-success" required>
-                    <option value="Homme">Homme</option>
-                    <option value="Femme">Femme</option>
-                    <option value="Autre">Autre</option>
-                </select>
             </div>
 
             <div class="mb-3">
@@ -697,26 +692,6 @@ try {
                 <input type="email" name="email" id="email-register" class="form-control border-success" required>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="niveau" class="form-label">Niveau</label>
-                    <select name="niveau" id="niveau" class="form-select border-success" required>
-                        <option value="Débutant">Débutant</option>
-                        <option value="Intermédiaire">Intermédiaire</option>
-                        <option value="Avancé">Avancé</option>
-                        <option value="Expert">Expert</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="points_experience" class="form-label">Points d'expérience</label>
-                    <input type="number" name="points_experience" id="points_experience" class="form-control border-success" required>
-                </div>
-            </div>
-
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" name="admin" id="admin" value="1">
-                <label for="admin" class="form-check-label">Administrateur</label>
-            </div>
             <div id="error-message-register" class="alert alert-danger" style="display: none;" role="alert"></div>
             <button type="submit" class="btn btn-success w-100 py-2">S'inscrire</button>
         </form>
