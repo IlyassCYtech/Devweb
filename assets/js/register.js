@@ -15,13 +15,18 @@ document.addEventListener("DOMContentLoaded", function() {
         const nom = document.getElementById('nom').value;
         const prenom = document.getElementById('prenom').value;
         const date_naissance = document.getElementById('date_naissance').value;
-        const age = document.getElementById('age').value;
         const sexe = document.getElementById('sexe').value;
         const type_membre = document.getElementById('type_membre').value;
         const email = document.getElementById('email-register').value;
-        const niveau = document.getElementById('niveau').value;
-        const points_experience = document.getElementById('points_experience').value;
-        const admin = document.getElementById('admin').checked ? 1 : 0;
+
+        // Validation de la date de naissance
+        const currentDate = new Date();
+        const birthDate = new Date(date_naissance);
+        if (birthDate > currentDate) {
+            errorMessageDiv.textContent = 'La date de naissance ne peut pas être dans le futur.';
+            errorMessageDiv.style.display = 'block';
+            return;
+        }
 
         // Créer un objet FormData pour envoyer les données du formulaire
         const formData = new FormData();
@@ -30,13 +35,9 @@ document.addEventListener("DOMContentLoaded", function() {
         formData.append('nom', nom);
         formData.append('prenom', prenom);
         formData.append('date_naissance', date_naissance);
-        formData.append('age', age);
         formData.append('sexe', sexe);
         formData.append('type_membre', type_membre);
         formData.append('email', email);
-        formData.append('niveau', niveau);
-        formData.append('points_experience', points_experience);
-        formData.append('admin', admin);
 
         // Initialiser une requête AJAX
         const xhr = new XMLHttpRequest();
