@@ -24,6 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
+        // Vérifier si le type_objet existe déjà
+        $checkStmt = $conn->prepare("SELECT COUNT(*) FROM DemandesTypeObjet WHERE type_objet = :type_objet");
+        $checkStmt->execute([':type_objet' => $type_objet]);
+        $exists = $checkStmt->fetchColumn();
+
+        if ($exists > 0) {
+            log_error("Type d'objet déjà existant : $type_objet.");
+            echo json_encode(['success' => false, 'message' => 'Ce type d\'objet existe déjà.']);
+            exit();
+        }
+
         $stmt = $conn->prepare("INSERT INTO DemandesTypeObjet (user_id, type_objet, date_demande) VALUES (:user_id, :type_objet, NOW())");
         $stmt->execute([
             ':user_id' => $user_id,
