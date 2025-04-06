@@ -122,17 +122,6 @@ INSERT INTO users (username, password, nom, prenom, date_naissance, age, sexe, t
 VALUES 
 ('janedoe', '123456', 'Doe', 'Jane', '1995-08-20', 28, 'Femme', 'développeur', 'jane.doe@example.com', 'Intermédiaire', 100, 1, 'default.jpg',000001,1,1);
 
--- Insertion d'un objet connecté avec un utilisateur spécifique
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Lampe intelligente', 'Éclairage', 'Lampe connectée avec réglage de lintensité', 'Philips', 'Actif', 'Wi-Fi', 'Électricité', 75.5, 'Allumé', '37.7749,-122.4194', NULL, 95, 1); -- UtilisateurID = 1
-
--- Insertion d'un autre objet connecté sans utilisateur (UtilisateurID = NULL)
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Caméra de sécurité', 'Surveillance', 'Caméra HD avec vision nocturne', 'Arlo', 'Actif', 'Wi-Fi', 'Batterie', NULL, NULL, '37.7749,-122.4194', NULL, 80, NULL); -- Pas d'utilisateur (UtilisateurID = NULL)
-
--- Insertion d'un autre objet connecté avec un autre utilisateur
-INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, Luminosite, EtatLuminaire, LocalisationGPS, Vitesse, EtatBatterie, UtilisateurID)
-VALUES ('Thermostat intelligent', 'Chauffage', 'Thermostat connecté réglable à distance', 'Nest', 'Actif', 'Wi-Fi', 'Électricité', NULL, NULL, '37.7749,-122.4194', NULL, 100, 2); -- UtilisateurID = 2
 
 -- Insertion de trois vélos à San Francisco
 INSERT INTO ObjetConnecte (Nom, Type, Description, Marque, Etat, Connectivite, EnergieUtilisee, DateAjout, Vitesse, EtatBatterie, LocalisationGPS)
