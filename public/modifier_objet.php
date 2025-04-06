@@ -40,6 +40,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->beginTransaction();
 
+        // Handle delete request
+        if (isset($_POST['request_delete'])) {
+            $deleteRequestStmt = $conn->prepare("
+                INSERT INTO DeleteRequests (user_id, object_id, request_date)
+                VALUES (:user_id, :object_id, NOW())
+            ");
+            $deleteRequestStmt->execute([
+                ':user_id' => $user_id,
+                ':object_id' => $object_id
+            ]);
+
+            $conn->commit();
+            echo json_encode(['success' => true]);
+            exit();
+        }
+
         $updates = [];
         $params = [':id' => $object_id];
 
@@ -250,6 +266,37 @@ $lng = isset($coordinates[1]) ? trim($coordinates[1]) : 2.3522;
                         </button>
                     </div>
                 </div>
+                <!-- filepath: /home/cytech/Devweb-main/Devweb-main/public/modifier_objet.php -->
+                <div class="mt-6">
+                    <h2 class="text-lg font-semibold mb-4">Actions</h2>
+                    <button id="request-delete" 
+                            class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600">
+                        Demander la suppression
+                    </button>
+                </div>
+
+                <script>
+                    document.getElementById('request-delete').addEventListener('click', () => {
+                        if (confirm('Voulez-vous vraiment demander la suppression de cet objet ?')) {
+                            fetch('modifier_objet.php?id=<?= $object_id ?>', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: 'request_delete=true'
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Votre demande de suppression a été envoyée.');
+                                } else {
+                                    alert('Erreur : ' + data.error);
+                                }
+                            })
+                            .catch(error => console.error('Erreur:', error));
+                        }
+                    });
+                </script>
 
                 <div>
                     <h2 class="text-lg font-semibold mb-4">Informations</h2>

@@ -126,6 +126,13 @@ try {
         // Enregistrer l'ID de l'utilisateur dans la session
         $_SESSION['user_id'] = $user_id;
 
+        // Enregistrer l'action dans l'historique
+        $historyStmt = $pdo->prepare("
+            INSERT INTO UserHistory (user_id, action_type) 
+            VALUES (:user_id, 'Inscription')
+        ");
+        $historyStmt->execute([':user_id' => $user_id]);
+
         // Envoi de l'email de confirmation
         $mail = new PHPMailer(true);
 
