@@ -1,85 +1,52 @@
-browser-sync start --proxy "localhost:8000" --files "accueil.php" "assets/css/*.css" "assets/js/*.js" "includes/*.php" "models/*.php" "public/*.php" "queries/*.sql"
+# Site San Francisco - Gestion d'une ville connecté
 
-php -S localhost:8000 -t projet
+Ce projet est une application web sur San Francisco développée en PHP avec une architecture modulaire. Il inclut des fonctionnalités d'administration, de gestion des utilisateurs, de sauvegarde/restauration de base de données avec des rapports PDF, d'informations sur la ville et des interactions avec les objets connectés (réservation, modifier les états etc...).
+
+## Structure du projet
+
+- composer.json        
+- composer.lock         
+- package.json          
+- suppression.php       
+- tempo.php             
+- admin/                
+- assets/               
+- backups/              
+- logs/                 
+- models/               
+- public/               
+- queries/              
+- uploads/             
+- vendor/               
+
+## Prérequis
+
+- **PHP** : Version 7.4 ou supérieure
+- **Composer** : Pour gérer les dépendances PHP
+- **MySQL** : Base de données utilisée par l'application
+- **Node.js** (optionnel) : Si des outils front-end sont utilisés
+
+## Installation
+
+1. Lancez le serveur local :
+   ```php -S localhost:8000 -t public dans le Terminal```
+   
+2. Ajouter dans la barre de recherche /public et vous serez redirigé vers l'index
+
+3. Pour lancer en mode développeur, mettez la commande dans me terminal :
+   ```browser-sync start --proxy "localhost:8000" --files "accueil.php" "assets/css/*.css" "assets/js/*.js" "includes/*.php" "models/*.php" "public/*.php" "queries/*.sql"```
 
 
+## Fonctionnalités principales
+
+- **Information sur la ville** : Information en temps réelle de la ville. 
+- **Administration** : Gestion des utilisateurs, des demandes, historique des actions sur le site et possibilité d'obtenir des rapports sur le site.
+- **Sauvegarde et restauration** : Sauvegarde et restauration de la base de données.
+- **Gestion des objets** : Upload et gestion des des objets connectés.
+- **Logs** : Suivi des activités via des fichiers de logs et backups si besoin.
 
 
+## Auteurs
 
-historique fonctionnel emprunt fonctionnelle
+- ALLUCHON Nicolas BANTOS-ARNAUD Damien CHAKHMOUN Ilyass NEHAD Younes SYEDA Abida
 
-systeme photo a faire
-modification de profil a faire
-historique admin et historique general de connection à faire 
-gestion des niveau (niveau operationel mais pas les droits attribuer)
-systeme de recherche fait
-partie admin:
-- il manque toutes la gestions des objets
-- possiblite de voir les vue
-
-
-il manque possiblement d'autres choses
-
-
-
-
-
-
-###ne pas lire
-
-
-├── Projet ING1 Dev Web_v4.pdf
-├── README.md
-├── admin/                     # 🛠 Fichiers liés à l'administration
-│   ├── admin.php
-│   ├── delete_user.php
-│   └── edit_user.php
-├── assets/                    # 🎨 Fichiers statiques
-│   ├── css/                   # CSS et styles
-│   │   └── bootstrap.min.css
-│   ├── images/                # Images
-│   │   ├── CY_Tech.png
-│   │   ├── background.png
-│   │   ├── default.jpg
-│   │   ├── trottinette.jpg
-│   │   ├── velo.jpg
-│   │   ├── vélo.jpg
-│   │   └── Projet ING1 Dev Web_v4.pdf (déplace-le ailleurs si ce n'est pas une image)
-│   └── js/                    # Scripts JavaScript
-│       ├── login.js
-│       ├── objet.js
-│       ├── register.js
-│       └── script.js
-├── config/                    # ⚙️ Configuration et connexion BDD
-│   ├── config.php
-│   ├── db_connect.php
-│   ├── initialize_database.php
-├── controllers/               # 🎯 Logique métier et gestion des requêtes
-│   ├── assign_object.php
-│   ├── return_object.php
-│   ├── process_login.php
-│   ├── search_object.php
-│   ├── search_user.php
-│   ├── suppression.php
-│   ├── ajouter_objet.php
-├── includes/                  # 📎 Inclusion des fichiers communs
-│   ├── header.php
-├── logs/                      # 📝 Fichiers logs
-│   ├── admin.log
-│   └── inscription.log
-├── models/                    # 🏗 Modèles de données (classes PHP)
-│   └── User.php
-├── database/                  # 🗄 Scripts SQL et base de données
-│   ├── users.sql
-├── public/                    # 🌍 Fichiers accessibles via le navigateur
-│   ├── index.php              # Page d'accueil
-│   ├── objets.php             # Page listant les objets
-│   ├── dashboard.php          # Tableau de bord utilisateur
-│   ├── profil.php             # Profil utilisateur
-│   ├── recherche.php          # Recherche d'objets
-│   ├── register.php           # Inscription
-│   ├── forget.php             # Mot de passe oublié
-│   ├── logout.php             # Déconnexion
-│   ├── background.png         # Image d'arrière-plan (déplacer dans assets/images/)
-├── uploads/                   # 📂 Stockage des fichiers uploadés
-│   └── default.jpg
