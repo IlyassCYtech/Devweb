@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Récupérer les informations de l'utilisateur
-$stmt = $conn->prepare("SELECT id, username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, is_confirmed,admin FROM users WHERE id = :id");
+$stmt = $conn->prepare("SELECT id, username, nom, prenom, date_naissance, sexe, email, niveau, points_experience, is_confirmed,admin, gestion FROM users WHERE id = :id");
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -258,6 +258,53 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
             </a>
         </div>
 
+        <div class="flex justify-end mb-8">
+    <?php if ($user['admin']) : ?>
+        <!-- Bouton pour les admins -->
+        <a href="../admin/creer_type_objet.php" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-opacity duration-200">
+            + Ajouter un type d'objet
+        </a>
+    <?php else : ?>
+        <!-- Bouton pour les non-admins -->
+        <button onclick="demanderCreationTypeObjet()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 transition-opacity duration-200">
+            Demander un type d'objet
+        </button>
+    <?php endif; ?>
+</div>
+
+<?php if ($user['gestion'] == 1 || $user['admin'] == 1): ?>
+    <div class="flex justify-end mb-8">
+        <a href="create_report.php" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-opacity duration-200">
+            📊 Générer un rapport
+        </a>
+    </div>
+<?php endif; ?>
+
+<script>
+function demanderCreationTypeObjet() {
+    const typeObjet = prompt("Entrez le nom du type d'objet que vous souhaitez demander :");
+    if (typeObjet) {
+        fetch('demande_type_objet.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `type_objet=${encodeURIComponent(typeObjet)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Votre demande a été envoyée avec succès !");
+            } else {
+                alert("Erreur : " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Erreur lors de l'envoi de la demande :", error);
+            alert("Une erreur est survenue. Veuillez réessayer.");
+        });
+    }
+}
+</script>
+
         <!-- Section Objets Utilisés -->
         <div class="mb-12">
             <h2 class="text-2xl font-semibold text-gray-800 section-header">Objets Utilisés</h2>
@@ -337,34 +384,110 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
     if (themeToggle) {
         themeToggle.style.display = 'block'; // Assurez-vous qu'il est visible
     }
-});
+    });
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const themeToggle = document.getElementById('theme-toggle');
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-            
-            // Get saved theme from localStorage
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.addEventListener("DOMContentLoaded", function () {
+                const themeToggle = document.getElementById('theme-toggle');
+                const darkIcon = document.getElementById('theme-toggle-dark-icon');
+                const lightIcon = document.getElementById('theme-toggle-light-icon');
+                
+                // Get saved theme from localStorage
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
 
-            // Show correct icon on page load
-            if (savedTheme === 'dark') {
-                darkIcon.classList.add('hidden');
-                lightIcon.classList.remove('hidden');
-            } else {
-                lightIcon.classList.add('hidden');
-                darkIcon.classList.remove('hidden');
-            }
+                // Show correct icon on page load
+                if (savedTheme === 'dark') {
+                    darkIcon.classList.add('hidden');
+                    lightIcon.classList.remove('hidden');
+                } else {
+                    lightIcon.classList.add('hidden');
+                    darkIcon.classList.remove('hidden');
+                }
 
-            if (themeToggle) {
-                themeToggle.style.display = 'block';
-            }
-        });
-  
+                if (themeToggle) {
+                    themeToggle.style.display = 'block';
+                }
+            });
 
-</script>
+            document.addEventListener('DOMContentLoaded', function () {
+        const dynamicContent = document.getElementById('dynamicContent');
+        const dynamicContentBody = document.getElementById('dynamicContentBody');
+        const showDynamicContent = document.getElementById('showDynamicContent');
+        const closeDynamicContent = document.getElementById('closeDynamicContent');
 
+        // Afficher la div
+        if (showDynamicContent) {
+            showDynamicContent.addEventListener('click', function () {
+                dynamicContent.classList.remove('hidden');
+                dynamicContentBody.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4">Créer un Type d'Objet</h2>
+                    <form id="createTypeForm" class="space-y-4">
+                        <div>
+                            <label for="type_objet" class="block text-sm font-medium text-gray-700">Nom du Type d'Objet :</label>
+                            <input type="text" id="type_objet" name="type_objet" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label for="type_image" class="block text-sm font-medium text-gray-700">Image du Type d'Objet :</label>
+                            <input type="file" id="type_image" name="type_image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" id="cancelCreateType" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                Annuler
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+                                Créer
+                            </button>
+                        </div>
+                    </form>
+                `;
+
+                // Gérer la soumission du formulaire
+                const createTypeForm = document.getElementById('createTypeForm');
+                createTypeForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(createTypeForm);
+
+                    fetch('../admin/creer_type_objet.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            alert(data);
+                            dynamicContent.classList.add('hidden');
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors de la création du type d\'objet :', error);
+                            alert('Une erreur est survenue. Veuillez réessayer.');
+                        });
+                });
+
+                // Gérer l'annulation
+                const cancelCreateType = document.getElementById('cancelCreateType');
+                cancelCreateType.addEventListener('click', function () {
+                    dynamicContent.classList.add('hidden');
+                });
+            });
+        }
+
+        // Masquer la div
+        if (closeDynamicContent) {
+            closeDynamicContent.addEventListener('click', function () {
+                dynamicContent.classList.add('hidden');
+            });
+        }
+    });
+
+    </script>
+<div id="dynamicContent" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl relative">t>-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl relative">
+            <button id="closeDynamicContent" class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm">X</button>
+            <div id="dynamicContentBody">
+                <!-- Le contenu dynamique sera chargé ici -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>
-
