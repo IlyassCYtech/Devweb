@@ -216,17 +216,26 @@ if (!file_exists($profilePicPath)) {
                     </div>
                 </div>
 
-                <div class="hidden sm:flex sm:items-center sm:justify-center flex-grow space-x-8">
-                    <a href="profil.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Profil</a>
-                    <a href="dashboard.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Accueil</a>
-                    <a href="objets.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
-                    <?php if (isset($user) && $user['admin']) : ?>
-                        <a href="../admin/admin.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium">Admin</a>
-                    <?php endif; ?>
-                    <a href="recherche.php" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">🔍</a>
+                <!-- Toggle button for mobile -->
+                <div class="sm:hidden flex items-center">
+                    <button id="mobile-menu-toggle" class="text-gray-700 hover:text-blue-600 focus:outline-none">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="flex items-center space-x-4">
+                <div id="nav-links" class="hidden sm:flex sm:items-center sm:justify-center flex-grow space-x-8">
+                    <a href="profil.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Profil</a>
+                    <a href="dashboard.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Accueil</a>
+                    <a href="objets.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
+                    <?php if ($user['admin']) : ?>
+                        <a href="../admin/admin.php" class="text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-sm font-medium">Admin</a>
+                    <?php endif; ?>
+                    <a href="recherche.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">🔍</a>
+                </div>
+
+                <div class="hidden sm:flex items-center space-x-4">
                     <button id="theme-toggle" class="theme-toggle">
                         <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
@@ -239,6 +248,23 @@ if (!file_exists($profilePicPath)) {
                         Déconnexion
                     </a>
                 </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden sm:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="profil.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Profil</a>
+                <a href="dashboard.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Accueil</a>
+                <a href="objets.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Objets</a>
+                <?php if ($user['admin']) : ?>
+                    <a href="../admin/admin.php" class="block text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-base font-medium">Admin</a>
+                <?php endif; ?>
+                <a href="recherche.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">🔍</a>
+                <button id="theme-toggle-mobile" class="block w-full text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium text-left">
+                    Mode Jour/Nuit
+                </button>
+                <a href="logout.php" class="block text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium">Déconnexion</a>
             </div>
         </div>
     </nav>
@@ -332,6 +358,17 @@ if (!file_exists($profilePicPath)) {
 
         // Gestionnaire d'événements pour le bouton de basculement
         document.getElementById('theme-toggle').addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // Toggle mobile menu visibility
+        document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+                // Gestionnaire d'événements pour le bouton de basculement mobile
+        document.getElementById('theme-toggle-mobile').addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             setTheme(currentTheme === 'dark' ? 'light' : 'dark');
         });

@@ -224,7 +224,16 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <div class="hidden sm:flex sm:items-center sm:justify-center flex-grow space-x-8">
+                <!-- Toggle button for mobile -->
+                <div class="sm:hidden flex items-center">
+                    <button id="mobile-menu-toggle" class="text-gray-700 hover:text-blue-600 focus:outline-none">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="nav-links" class="hidden sm:flex sm:items-center sm:justify-center flex-grow space-x-8">
                     <a href="profil.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Profil</a>
                     <a href="dashboard.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Accueil</a>
                     <a href="objets.php" class="nav-link text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Objets</a>
@@ -233,8 +242,9 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endif; ?>
                     <a href="recherche.php" class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">🔍</a>
                 </div>
-                <div class="flex items-center space-x-4">
-                <button id="theme-toggle" class="theme-toggle">
+
+                <div class="hidden sm:flex items-center space-x-4">
+                    <button id="theme-toggle" class="theme-toggle">
                         <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
                         </svg>
@@ -248,15 +258,34 @@ $types = $typeStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden sm:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="profil.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Profil</a>
+                <a href="dashboard.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Accueil</a>
+                <a href="objets.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">Objets</a>
+                <?php if ($user['admin']) : ?>
+                    <a href="../admin/admin.php" class="block text-yellow-600 hover:text-yellow-700 px-3 py-2 rounded-md text-base font-medium">Admin</a>
+                <?php endif; ?>
+                <a href="recherche.php" class="block text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium">🔍</a>
+                <button id="theme-toggle-mobile" class="block w-full text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-base font-medium text-left">
+                    Mode Jour/Nuit
+                </button>
+                <a href="logout.php" class="block text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium">Déconnexion</a>
+            </div>
+        </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-900">Gestion des Objets Connectés</h1>
-            <a href="ajouter_objet.php" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 transition-opacity duration-200">
-                + Ajouter un objet
-            </a>
-        </div>
+    <?php if ($user['admin'] || $user['gestion']) : ?>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900">Gestion des Objets Connectés</h1>
+        <a href="ajouter_objet.php" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-bg hover:opacity-90 transition-opacity duration-200">
+            + Ajouter un objet
+        </a>
+    </div>
+<?php endif; ?>
 
         <div class="flex justify-end mb-8">
     <?php if ($user['admin']) : ?>
@@ -479,7 +508,17 @@ function demanderCreationTypeObjet() {
         }
     });
 
-    </script>
+    // Toggle mobile menu visibility
+    document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenu.classList.toggle('hidden');
+    });
+        // Gestionnaire d'événements pour le bouton de basculement mobile
+    document.getElementById('theme-toggle-mobile').addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+</script>
 <div id="dynamicContent" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl relative">t>-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl relative">
